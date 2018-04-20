@@ -1,53 +1,38 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using Ozeki.Media;
 using Ozeki.VoIP;
-using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 namespace WieloosobowyKomunikatorGlosowy
 {
     public class Klient
     {
-        string destinationIP;
+
         //OZEKI
-        static ISoftPhone softphone;   // softphone object
-        static IPhoneLine phoneLine;   // phoneline object
-        static IPhoneCall call;
-        static string caller;
-        static Microphone microphone;
-        static Speaker speaker;
-        static PhoneCallAudioSender mediaSender;
-        static PhoneCallAudioReceiver mediaReceiver;
-        static MediaConnector connector;
-        private Thread Caller;
+        public ISoftPhone softphone;   // softphone object
+        public IPhoneLine phoneLine;   // phoneline object
+        public IPhoneCall call;
+        public string caller;
+        public Microphone microphone;
+        public Speaker speaker;
+        public PhoneCallAudioSender mediaSender;
+        public PhoneCallAudioReceiver mediaReceiver;
+        public MediaConnector connector;
+        public string local_ip;
 
 
-        static string local_ip = GetLocalIPAddress();
-        static string destination_ip;
-        static string destination_user;
 
-        //Server 
-        private TcpListener _server;
-        private Boolean _isRunning;
-        private IPAddress ipAd = IPAddress.Parse(GetLocalIPAddress());
-        private int port = 8003;
-        private static int port2 = 8003;
-        private static Boolean busy { get; set; }
+        public Klient()
+        {
+            local_ip = GetLocalIPAddress();
+            OzekiInitialization();
+            SetupDevices();
 
+        }
 
-        //Klient 
-        private static TcpClient _client;
-        private static StreamReader _sReader;
-        private static StreamWriter _sWriter;
-        private static Boolean _isConnected;
-        public static string data;
-        public static String sDataIncomming;
-
-        public void Ozeki()
+        public void OzekiInitialization()
         {
             softphone = SoftPhoneFactory.CreateSoftPhone(6000, 6200);
 
@@ -63,22 +48,22 @@ namespace WieloosobowyKomunikatorGlosowy
             softphone.IncomingCall += softphone_IncomingCall;
             softphone.RegisterPhoneLine(phoneLine);
         }
-        private static void line_RegStateChanged(object sender, RegistrationStateChangedArgs e)
+        public void line_RegStateChanged(object sender, RegistrationStateChangedArgs e)
         {
 
             if (e.State == RegState.NotRegistered || e.State == RegState.Error)
             {
                 //Status.Invoke(new MethodInvoker(delegate { Status.Text = "Blad rejestracji!"; }));
-                Console.WriteLine("blad rejestracji");               
+                //Console.WriteLine("blad rejestracji");
             }
 
             if (e.State == RegState.RegistrationSucceeded)
             {
                 //Status.Invoke(new MethodInvoker(delegate { Status.Text = "Zarejestrowano"; }));
-                Console.WriteLine("zarejestrowano");
+                //Console.WriteLine("zarejestrowano");
             }
         }
-        public static void StartCall(string numberToDial)
+        public void StartCall(string numberToDial)
         {
 
 
@@ -92,7 +77,7 @@ namespace WieloosobowyKomunikatorGlosowy
                 call.Start();
             }
         }
-        static void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
+        public void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
         {
 
             call = e.Item;
@@ -102,14 +87,14 @@ namespace WieloosobowyKomunikatorGlosowy
             SetupDevices();
             call.Answer();
         }
-        static void call_CallStateChanged(object sender, CallStateChangedArgs e)
+        public void call_CallStateChanged(object sender, CallStateChangedArgs e)
         {
             //Status.Invoke(new MethodInvoker(delegate { Status.Text = e.State.ToString(); }));
 
             if (e.State == CallState.Completed)
             {
                 //MessageBox.Show("Zakończono rozmowę");
-                Console.WriteLine("zakonczono rozmowe");
+                //Console.WriteLine("zakonczono rozmowe");
             }
 
             if (e.State == CallState.Answered)
@@ -118,7 +103,7 @@ namespace WieloosobowyKomunikatorGlosowy
             if (e.State.IsCallEnded())
                 CloseDevices();
         }
-        public static void SetupDevices()
+        public void SetupDevices()
         {
             microphone.Start();
             connector.Connect(microphone, mediaSender);
@@ -129,7 +114,7 @@ namespace WieloosobowyKomunikatorGlosowy
             mediaSender.AttachToCall(call);
             mediaReceiver.AttachToCall(call);
         }
-        static void CloseDevices()
+        public void CloseDevices()
         {
             phoneLine.Dispose();
             microphone.Dispose();
@@ -138,7 +123,7 @@ namespace WieloosobowyKomunikatorGlosowy
             mediaSender.Detach();
             connector.Dispose();
         }
-        static string GetLocalIPAddress()
+        public string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
@@ -150,24 +135,10 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             throw new Exception("Local IP Address Not Found!");
         }
-        public static void HandleCommunication()
-        {
-            _sReader = new StreamReader(_client.GetStream(), Encoding.ASCII);
-            _sWriter = new StreamWriter(_client.GetStream(), Encoding.ASCII);
 
-            _isConnected = true;
 
-        }
-        public static Boolean connect()
-        {
-            IPAddress ip = IPAddress.Parse(destination_ip);
-            _client = new TcpClient();
-            _client.Connect(ip, port2);
-            HandleCommunication();
-            return true;
-        }
         [STAThread]
-        static void Main()
+        public static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
