@@ -38,7 +38,7 @@
             this.lb_Log.Name = "lb_Log";
             this.lb_Log.Size = new System.Drawing.Size(248, 238);
             this.lb_Log.TabIndex = 0;
-            this.lb_Log.SelectedIndexChanged += new System.EventHandler(this.lb_Log_SelectedIndexChanged);
+            
             // 
             // Form1
             // 
