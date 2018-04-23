@@ -19,12 +19,16 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
         public Serwer()
         {
-            local_ip = GetLocalIPAddress();
-            OzekiInitialization();
-            InitializeConferenceRoom();
+            //local_ip = GetLocalIPAddress();
+            local_ip = "127.0.0.1";
+            //OzekiInitialization();
+            //InitializeConferenceRoom();
+            TCP_Connection tcp = new TCP_Connection(local_ip);
+
+
         }
 
-        public void OzekiInitialization()
+    public void OzekiInitialization()
         {
             softphone = SoftPhoneFactory.CreateSoftPhone(6000, 6200);
             var config = new DirectIPPhoneLineConfig(local_ip, 5060);
@@ -42,6 +46,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             conferenceRoom = new ConferenceRoom();
             conferenceRoom.StartConferencing();
         }
+        
 
         static void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
         {

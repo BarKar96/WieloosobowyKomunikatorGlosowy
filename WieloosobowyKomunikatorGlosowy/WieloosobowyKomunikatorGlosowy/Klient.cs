@@ -21,15 +21,18 @@ namespace WieloosobowyKomunikatorGlosowy
         public PhoneCallAudioReceiver mediaReceiver;
         public MediaConnector connector;
         public string local_ip;
-
+        public string server_ip;
+        public static TCP_Connection tcp;
 
 
         public Klient()
         {
-            local_ip = GetLocalIPAddress();
-            OzekiInitialization();
-            SetupDevices();
-
+            //local_ip = GetLocalIPAddress();
+            local_ip = "127.0.0.1";
+            server_ip = "127.0.0.1";
+            //OzekiInitialization();
+            //SetupDevices();
+            tcp = new TCP_Connection();
         }
 
         public void OzekiInitialization()
@@ -142,7 +145,7 @@ namespace WieloosobowyKomunikatorGlosowy
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Login());
         }
     }
 }
