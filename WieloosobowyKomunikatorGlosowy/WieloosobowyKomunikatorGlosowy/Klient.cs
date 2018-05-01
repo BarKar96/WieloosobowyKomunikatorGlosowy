@@ -32,7 +32,7 @@ namespace WieloosobowyKomunikatorGlosowy
             server_ip = "127.0.0.1";
             //OzekiInitialization();
             //SetupDevices();
-            tcp = new TCP_Connection();
+           // tcp = new TCP_Connection();
         }
 
         public void OzekiInitialization()
@@ -145,7 +145,7 @@ namespace WieloosobowyKomunikatorGlosowy
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Login());
+            Application.Run(new ChannelsView());
         }
     }
 }

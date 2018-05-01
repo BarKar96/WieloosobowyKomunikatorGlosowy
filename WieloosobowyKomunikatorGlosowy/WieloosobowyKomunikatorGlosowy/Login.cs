@@ -51,7 +51,7 @@ namespace WieloosobowyKomunikatorGlosowy
             {
                 //+ łączenie z bazą danych
                 this.Hide();
-                Form1 frm = new Form1();
+                ChannelsView frm = new ChannelsView();
                 frm.ShowDialog();
             }
         }
