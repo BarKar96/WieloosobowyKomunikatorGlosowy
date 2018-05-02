@@ -38,6 +38,7 @@
             this.mute_button = new System.Windows.Forms.Button();
             this.join_button = new System.Windows.Forms.Button();
             this.refresh_button = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -75,9 +76,9 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(344, 369);
             this.dataGridView1.TabIndex = 0;
-            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             // 
             // Nazwa
             // 
@@ -129,7 +130,7 @@
             // 
             // refresh_button
             // 
-            this.refresh_button.Location = new System.Drawing.Point(471, 31);
+            this.refresh_button.Location = new System.Drawing.Point(376, 31);
             this.refresh_button.Name = "refresh_button";
             this.refresh_button.Size = new System.Drawing.Size(75, 23);
             this.refresh_button.TabIndex = 4;
@@ -137,12 +138,23 @@
             this.refresh_button.UseVisualStyleBackColor = true;
             this.refresh_button.Click += new System.EventHandler(this.refresh_button_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(723, 31);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 6;
+            this.button2.Text = "exit";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // ChannelsView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(953, 459);
             this.ControlBox = false;
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.refresh_button);
             this.Controls.Add(this.join_button);
             this.Controls.Add(this.mute_button);
@@ -168,6 +180,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Opis;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Haslo;
         private System.Windows.Forms.Button refresh_button;
+        private System.Windows.Forms.Button button2;
     }
 }
 

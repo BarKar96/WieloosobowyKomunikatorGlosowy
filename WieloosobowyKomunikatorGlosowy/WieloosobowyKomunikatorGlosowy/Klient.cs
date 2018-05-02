@@ -27,17 +27,17 @@ namespace WieloosobowyKomunikatorGlosowy
 
         public Klient()
         {
-            //local_ip = GetLocalIPAddress();
-            local_ip = "127.0.0.1";
-            server_ip = "127.0.0.1";
-            //OzekiInitialization();
-            //SetupDevices();
+           local_ip = GetLocalIPAddress();
+            //local_ip = "127.0.0.1";
+            //server_ip = "127.0.0.1";
+            OzekiInitialization();
+            SetupDevices();
            // tcp = new TCP_Connection();
         }
 
         public void OzekiInitialization()
         {
-            softphone = SoftPhoneFactory.CreateSoftPhone(6000, 6200);
+            softphone = SoftPhoneFactory.CreateSoftPhone(5000, 10000);
 
             microphone = Microphone.GetDefaultDevice();
             speaker = Speaker.GetDefaultDevice();
@@ -57,26 +57,22 @@ namespace WieloosobowyKomunikatorGlosowy
             if (e.State == RegState.NotRegistered || e.State == RegState.Error)
             {
                 //Status.Invoke(new MethodInvoker(delegate { Status.Text = "Blad rejestracji!"; }));
-                //Console.WriteLine("blad rejestracji");
+                Console.WriteLine("blad rejestracji");
             }
 
             if (e.State == RegState.RegistrationSucceeded)
             {
                 //Status.Invoke(new MethodInvoker(delegate { Status.Text = "Zarejestrowano"; }));
-                //Console.WriteLine("zarejestrowano");
+                Console.WriteLine("zarejestrowano");
             }
         }
-        public void StartCall(string numberToDial)
+        public void StartCall(string numberToDial, string port)
         {
-
-
             if (call == null)
             {
                 Console.WriteLine("starting call");
-                call = softphone.CreateDirectIPCallObject(phoneLine, new DirectIPDialParameters("5060"), numberToDial);
+                call = softphone.CreateDirectIPCallObject(phoneLine, new DirectIPDialParameters(port), numberToDial);
                 call.CallStateChanged += call_CallStateChanged;
-
-
                 call.Start();
             }
         }
@@ -89,6 +85,7 @@ namespace WieloosobowyKomunikatorGlosowy
             call.CallStateChanged += call_CallStateChanged;
             SetupDevices();
             call.Answer();
+            
         }
         public void call_CallStateChanged(object sender, CallStateChangedArgs e)
         {
@@ -99,10 +96,8 @@ namespace WieloosobowyKomunikatorGlosowy
                 //MessageBox.Show("Zakończono rozmowę");
                 //Console.WriteLine("zakonczono rozmowe");
             }
-
             if (e.State == CallState.Answered)
                 SetupDevices();
-
             if (e.State.IsCallEnded())
                 CloseDevices();
         }
