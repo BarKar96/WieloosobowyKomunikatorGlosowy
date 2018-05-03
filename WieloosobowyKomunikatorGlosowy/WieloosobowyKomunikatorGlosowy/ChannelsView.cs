@@ -17,7 +17,8 @@ namespace WieloosobowyKomunikatorGlosowy
         private List<Channel> channelsList;
         private Klient k;
         private string serverIP;
-
+        private int currentChannel = 0;
+        private int nextChannel = 0;
         //tcp
         SimpleTcpClient client;
 
@@ -25,46 +26,66 @@ namespace WieloosobowyKomunikatorGlosowy
         {
             
             InitializeComponent();
-
+            serverIP = "192.168.1.28";
+            channelsList = new List<Channel>();
+            channelsList.Add(new Channel("m", "d", "p"));
+            channelsList.Add(new Channel("m", "d", "p"));
+            channelsList.Add(new Channel("m", "d", "p"));
+            channelsList.Add(new Channel("m", "d", "p"));
+            refreshGridView();
             //Ozeki
             k = new Klient();
-            //k.StartCall("192.168.1.14");
 
             //TCP
-            serverIP = "192.168.1.14";
+            SetupTCPClient();
+        }
+
+        private void SetupTCPClient()
+        {
             client = new SimpleTcpClient();
             client.StringEncoder = Encoding.UTF8;
             client.DataReceived += Client_DataReceived;
+            client.Connect(serverIP, 8910);
         }
-
 
         private void Client_DataReceived(object sender, SimpleTCP.Message e)
         {
-            Console.WriteLine(e.MessageString);
+            Console.WriteLine("serwer odpowiedzial: "+ e.MessageString);           
             if (e.MessageString == "OK")
             {
-                k.StartCall(serverIP);   
+                k.SetupDevices();
+                k.StartCall(serverIP);
+               
             }
-            Console.WriteLine("tutaj koniec");
+            if (e.MessageString == "BYE")
+            {
+                k.HangUp();
+            }
+            else
+            {
+                Console.WriteLine("blad przechodzenia na kanal");
+            }
+            //Console.WriteLine("tutaj koniec");
         }
 
         private void join_button_Click(object sender, EventArgs e)
         {
-            client.WriteLine("ch0");
+            
+            client.WriteLine("ch" + dataGridView1.CurrentCell.RowIndex);
+            currentChannel = dataGridView1.CurrentCell.RowIndex;
         }
 
         private void mute_button_Click(object sender, EventArgs e)
         {
 
-            client.Connect("192.168.1.14", 8910);
+            
         }
 
         private void logout_button_Click(object sender, EventArgs e)
         {
         
         }
-
-        private void refresh_button_Click(object sender, EventArgs e)
+        private void refreshGridView()
         {
             this.dataGridView1.DataSource = null;
             this.dataGridView1.Rows.Clear();
@@ -80,6 +101,10 @@ namespace WieloosobowyKomunikatorGlosowy
                 }
             }
         }
+        private void refresh_button_Click(object sender, EventArgs e)
+        {
+            refreshGridView();
+        }
 
 
         private void button2_Click(object sender, EventArgs e)
@@ -89,7 +114,9 @@ namespace WieloosobowyKomunikatorGlosowy
 
         private void btn_endCall_Click(object sender, EventArgs e)
         {
-            k.HangUp();
+            client.WriteLine("BYE"+ currentChannel);
         }
+
+
     }
 }

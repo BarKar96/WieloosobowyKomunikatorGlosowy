@@ -24,9 +24,9 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
         public List<ConferenceRoom> conferenceRoomlist;
 
-        List<ClientCall> callList;
+      
 
-        public int whichChannel = 0;
+        public int whichChannel = -1;
 
         //TCP
         SimpleTcpServer server;
@@ -36,11 +36,13 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             InitializeComponent();
             
             //Ozeki
-            callList = new List<ClientCall>();
             local_ip = GetLocalIPAddress();
             OzekiInitialization();
             //InitializeConferenceRoom();
             conferenceRoomlist = new List<ConferenceRoom>();
+
+            conferenceRoomlist.Add(new ConferenceRoom());
+            conferenceRoomlist.Add(new ConferenceRoom());
             conferenceRoomlist.Add(new ConferenceRoom());
             conferenceRoomlist.Add(new ConferenceRoom());
 
@@ -60,18 +62,42 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         private void Server_DataReceived(object sender, SimpleTCP.Message e)
         {
             string message = e.MessageString.Remove(e.MessageString.Length - 1);
-            Console.WriteLine(e.MessageString);
-            if(message == "ch1")
+            Console.WriteLine(message);
+            if(message == "ch0")
             {
                 whichChannel = 0;
                 e.Reply("OK");
                 
             }
-            else if (message == "ch2")
+            else if (message == "ch1")
             {
                 whichChannel = 1;
+                e.Reply("OK");                
+            }
+            else if (message == "ch2")
+            {
+                whichChannel = 2;
                 e.Reply("OK");
-                
+            }
+            else if (message == "ch3")
+            {
+                whichChannel = 3;
+                e.Reply("OK");
+            }
+            else if (message == "BYE0")
+            {
+                whichChannel = 0;
+                e.Reply("BYE");
+            }
+            else if (message == "BYE1")
+            {
+                whichChannel = 1;
+                e.Reply("BYE");
+            }
+            else if (message == "BYE2")
+            {
+                whichChannel = 2;
+                e.Reply("BYE");
             }
             else
             {
@@ -94,20 +120,9 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         }
 
 
-        void InitializeConferenceRoom()
-        {
-            for (int i =0; i<conferenceRoomlist.Count; i++)
-            {
-                conferenceRoomlist[i] = new ConferenceRoom();
-            }
-    
-        }
-
-
         void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
         {
             call = e.Item;            
-            callList.Add(new ClientCall(call.CallID, call));
             call.CallStateChanged += call_CallStateChanged;
             call.Answer();
         }
@@ -130,13 +145,13 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             call = sender as IPhoneCall;
             if (e.State == CallState.Answered)
             {
-               
-                    conferenceRoomlist[whichChannel].AddToConference(call);
-                    Console.WriteLine("added to conf " + whichChannel);                 
+                conferenceRoomlist[whichChannel].AddToConference(call);
+                Console.WriteLine("added to channel " + whichChannel);                 
             }
             else if (e.State.IsCallEnded())
             {
-               
+                conferenceRoomlist[whichChannel].RemoveFromConference(call);
+                Console.WriteLine("removed from channel " + whichChannel);
             }
 
         }
@@ -152,18 +167,12 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }
             throw new Exception("Local IP Address Not Found!");
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //conferenceRoom.RemoveFromConference(callList[Int32.Parse(textBox1.Text)].call);
-            //Console.WriteLine("usunieto " + callList[Int32.Parse(textBox1.Text)].call.CallID);
-            //callList.RemoveAt(Int32.Parse(textBox1.Text));
-        }
+        
 
         private void button2_Click(object sender, EventArgs e)
         {
             
-            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.14");
+            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.28");
             server.Start(ip, 8910);
             Console.WriteLine("server started");
         }
