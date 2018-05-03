@@ -13,25 +13,24 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
     public partial class Server : Form
     {
         static int xyz = 0;
-
-        static ISoftPhone softphone;   // softphone object
-        static ISoftPhone softphone1;
-
-        static IPhoneLine phoneLine;
-        static IPhoneLine phoneLine1; // phoneline object
+        public IPhoneCall call;
+        public ISoftPhone softphone;   // softphone object
+        public IPhoneLine phoneLine;
 
         public string local_ip;
-        public static ConferenceRoom conferenceRoom;
-        public static ConferenceRoom conferenceRoom1;
+        public ConferenceRoom conferenceRoom;
+        public ConferenceRoom conferenceRoom1;
 
-
+        List<ClientCall> callList;
         public Server()
-        {
+        {    
             InitializeComponent();
+            callList = new List<ClientCall>();
             local_ip = GetLocalIPAddress();
-            //local_ip = "127.0.0.1";
             OzekiInitialization();
             InitializeConferenceRoom();
+
+            //local_ip = "127.0.0.1";
             //TCP_Connection tcp = new TCP_Connection(local_ip);
         }
 
@@ -48,7 +47,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
 
 
-        static void InitializeConferenceRoom()
+        void InitializeConferenceRoom()
         {
             conferenceRoom = new ConferenceRoom();
             conferenceRoom.StartConferencing();
@@ -59,38 +58,33 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         }
 
 
-        static void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
+        void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
         {
-            IPhoneCall call = e.Item;
+            call = e.Item;            
+            callList.Add(new ClientCall(call.CallID, call));
             call.CallStateChanged += call_CallStateChanged;
             call.Answer();
-
         }
 
-        static void line_RegStateChanged(object sender, RegistrationStateChangedArgs e)
+        void line_RegStateChanged(object sender, RegistrationStateChangedArgs e)
         {
 
             IPhoneCall call = sender as IPhoneCall;
-           
-
             if (e.State == RegState.NotRegistered || e.State == RegState.Error)
                 Console.WriteLine("Registration failed!");
 
             if (e.State == RegState.RegistrationSucceeded)
             {
-                Console.WriteLine("Registration succeeded - Online!");
-                InitializeConferenceRoom();
+                Console.WriteLine("Registration succeeded - Online!");                
             }
         }
 
-        static void call_CallStateChanged(object sender, CallStateChangedArgs e)
+        void call_CallStateChanged(object sender, CallStateChangedArgs e)
         {
-
-            IPhoneCall call = sender as IPhoneCall;
-
+            call = sender as IPhoneCall;
             if (e.State == CallState.Answered)
             {
-                if (xyz < 1)
+                if (xyz < 2)
                 {
                     conferenceRoom.AddToConference(call);
                     Console.WriteLine("added to conf 1");
@@ -108,19 +102,18 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                 if (xyz <= 2)
                 {
                     conferenceRoom.RemoveFromConference(call);
-                    Console.WriteLine("rem to conf 1");
+                    Console.WriteLine("rem from conf 1");
                 }
                 else
                 {
                     conferenceRoom1.RemoveFromConference(call);
-                    Console.WriteLine("rem to conf 2");
+                    Console.WriteLine("rem from conf 2");
                 }
 
             }
 
         }
-
-
+        
         public string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -134,6 +127,13 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             throw new Exception("Local IP Address Not Found!");
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            conferenceRoom.RemoveFromConference(callList[Int32.Parse(textBox1.Text)].call);
+            Console.WriteLine("usunieto " + callList[Int32.Parse(textBox1.Text)].call.CallID);
+            callList.RemoveAt(Int32.Parse(textBox1.Text));
+        }
+
         [STAThread]
         static void Main()
         {
@@ -141,6 +141,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Server());
         }
+
     }
 }
 

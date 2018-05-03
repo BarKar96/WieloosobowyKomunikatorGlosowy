@@ -14,6 +14,7 @@ namespace WieloosobowyKomunikatorGlosowy
     {
         private List<Channel> channelsList;
         private Klient k;
+       
 
 
         public ChannelsView()
@@ -36,14 +37,13 @@ namespace WieloosobowyKomunikatorGlosowy
 
         private void mute_button_Click(object sender, EventArgs e)
         {
-            k.StartCall("192.168.1.28", "5070");
-            Console.WriteLine("calling 5070");
+            k.StartCall("192.168.1.15");
+            Console.WriteLine("calling");
         }
 
         private void logout_button_Click(object sender, EventArgs e)
         {
-            k.StartCall("192.168.1.28", "5060");
-            Console.WriteLine("calling 5060");
+        
         }
 
         private void refresh_button_Click(object sender, EventArgs e)
@@ -67,6 +67,11 @@ namespace WieloosobowyKomunikatorGlosowy
         private void button2_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void btn_endCall_Click(object sender, EventArgs e)
+        {
+            k.HangUp();
         }
     }
 }

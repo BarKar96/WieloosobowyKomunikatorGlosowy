@@ -13,7 +13,7 @@ namespace WieloosobowyKomunikatorGlosowy
         //OZEKI
         public ISoftPhone softphone;   // softphone object
         public IPhoneLine phoneLine;   // phoneline object
-        public IPhoneCall call;
+        public IPhoneCall call = null;
         public string caller;
         public Microphone microphone;
         public Speaker speaker;
@@ -66,22 +66,21 @@ namespace WieloosobowyKomunikatorGlosowy
                 Console.WriteLine("zarejestrowano");
             }
         }
-        public void StartCall(string numberToDial, string port)
+        public void StartCall(string numberToDial)
         {
             if (call == null)
             {
                 Console.WriteLine("starting call");
-                call = softphone.CreateDirectIPCallObject(phoneLine, new DirectIPDialParameters(port), numberToDial);
+                call = softphone.CreateDirectIPCallObject(phoneLine, new DirectIPDialParameters("5060"), numberToDial);
                 call.CallStateChanged += call_CallStateChanged;
                 call.Start();
+                
             }
         }
         public void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
         {
-
             call = e.Item;
             caller = call.DialInfo.CallerID;
-
             call.CallStateChanged += call_CallStateChanged;
             SetupDevices();
             call.Answer();
@@ -94,7 +93,7 @@ namespace WieloosobowyKomunikatorGlosowy
             if (e.State == CallState.Completed)
             {
                 //MessageBox.Show("Zakończono rozmowę");
-                //Console.WriteLine("zakonczono rozmowe");
+                Console.WriteLine("zakonczono rozmowe");
             }
             if (e.State == CallState.Answered)
                 SetupDevices();
@@ -105,15 +104,14 @@ namespace WieloosobowyKomunikatorGlosowy
         {
             microphone.Start();
             connector.Connect(microphone, mediaSender);
-
             speaker.Start();
             connector.Connect(mediaReceiver, speaker);
-
             mediaSender.AttachToCall(call);
             mediaReceiver.AttachToCall(call);
         }
         public void CloseDevices()
         {
+            Console.WriteLine("closeDevices");
             phoneLine.Dispose();
             microphone.Dispose();
             speaker.Dispose();
@@ -133,7 +131,20 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             throw new Exception("Local IP Address Not Found!");
         }
-
+        public void HangUp()
+        {
+            if (call != null)
+            {
+                call.HangUp();
+                call.CallStateChanged += call_CallStateChanged;
+                call = null;
+                
+            }
+            else
+            {
+                Console.WriteLine("nie bylo polaczenia");
+            }
+        }
 
         [STAThread]
         public static void Main()

@@ -13,13 +13,12 @@ namespace WieloosobowyKomunikatorGlosowy
         public string password = null;
         public int port;
 
-        public Channel(string name, string description, string password, int port)
+        public Channel(string name, string description, string password)
         {
             this.name = name;
             this.description = description;
             this.password = password;
-            this.port = port;
-
+          
         }
     }
 }

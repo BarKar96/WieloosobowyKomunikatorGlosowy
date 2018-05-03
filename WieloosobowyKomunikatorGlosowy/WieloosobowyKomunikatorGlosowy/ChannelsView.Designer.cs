@@ -39,6 +39,7 @@
             this.join_button = new System.Windows.Forms.Button();
             this.refresh_button = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.btn_endCall = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -148,12 +149,23 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // btn_endCall
+            // 
+            this.btn_endCall.Location = new System.Drawing.Point(376, 86);
+            this.btn_endCall.Name = "btn_endCall";
+            this.btn_endCall.Size = new System.Drawing.Size(75, 23);
+            this.btn_endCall.TabIndex = 7;
+            this.btn_endCall.Text = "zakończ";
+            this.btn_endCall.UseVisualStyleBackColor = true;
+            this.btn_endCall.Click += new System.EventHandler(this.btn_endCall_Click);
+            // 
             // ChannelsView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(953, 459);
             this.ControlBox = false;
+            this.Controls.Add(this.btn_endCall);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.refresh_button);
             this.Controls.Add(this.join_button);
@@ -181,6 +193,7 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn Haslo;
         private System.Windows.Forms.Button refresh_button;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btn_endCall;
     }
 }
 

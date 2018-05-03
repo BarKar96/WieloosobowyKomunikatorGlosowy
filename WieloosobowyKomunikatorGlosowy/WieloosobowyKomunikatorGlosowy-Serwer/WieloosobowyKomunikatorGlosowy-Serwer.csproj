@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientCall.cs" />
     <Compile Include="TCP_Connection.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Server.cs">
