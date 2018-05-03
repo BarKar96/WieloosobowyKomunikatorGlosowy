@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleTCP;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,33 +13,50 @@ namespace WieloosobowyKomunikatorGlosowy
 {
     public partial class ChannelsView : Form
     {
+        //ozeki
         private List<Channel> channelsList;
         private Klient k;
-       
+        private string serverIP;
 
+        //tcp
+        SimpleTcpClient client;
 
         public ChannelsView()
         {
-
+            
             InitializeComponent();
+
+            //Ozeki
             k = new Klient();
-            //k.OzekiInitialization();
-            //k.SetupDevices();
-            //channelsList = new List<Channel>();
-            //channelsList.Add(new Channel("c", "c", "a", 12));
-            //channelsList.Add(new Channel("c", "c", null, 13));
+            //k.StartCall("192.168.1.14");
+
+            //TCP
+            serverIP = "192.168.1.14";
+            client = new SimpleTcpClient();
+            client.StringEncoder = Encoding.UTF8;
+            client.DataReceived += Client_DataReceived;
+        }
+
+
+        private void Client_DataReceived(object sender, SimpleTCP.Message e)
+        {
+            Console.WriteLine(e.MessageString);
+            if (e.MessageString == "OK")
+            {
+                k.StartCall(serverIP);   
+            }
+            Console.WriteLine("tutaj koniec");
         }
 
         private void join_button_Click(object sender, EventArgs e)
         {
-            int i = dataGridView1.CurrentCell.RowIndex;
-            Console.WriteLine(i);
+            client.WriteLine("ch0");
         }
 
         private void mute_button_Click(object sender, EventArgs e)
         {
-            k.StartCall("192.168.1.15");
-            Console.WriteLine("calling");
+
+            client.Connect("192.168.1.14", 8910);
         }
 
         private void logout_button_Click(object sender, EventArgs e)

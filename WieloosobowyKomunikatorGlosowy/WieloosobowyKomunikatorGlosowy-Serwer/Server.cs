@@ -1,10 +1,12 @@
 ﻿using Ozeki.Media;
 using Ozeki.VoIP;
+using SimpleTCP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -12,27 +14,74 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 {
     public partial class Server : Form
     {
+
+        //Ozeki
         static int xyz = 0;
         public IPhoneCall call;
         public ISoftPhone softphone;   // softphone object
         public IPhoneLine phoneLine;
-
         public string local_ip;
-        public ConferenceRoom conferenceRoom;
-        public ConferenceRoom conferenceRoom1;
+
+        public List<ConferenceRoom> conferenceRoomlist;
 
         List<ClientCall> callList;
+
+        public int whichChannel = 0;
+
+        //TCP
+        SimpleTcpServer server;
+       
         public Server()
         {    
             InitializeComponent();
+            
+            //Ozeki
             callList = new List<ClientCall>();
             local_ip = GetLocalIPAddress();
             OzekiInitialization();
-            InitializeConferenceRoom();
+            //InitializeConferenceRoom();
+            conferenceRoomlist = new List<ConferenceRoom>();
+            conferenceRoomlist.Add(new ConferenceRoom());
+            conferenceRoomlist.Add(new ConferenceRoom());
 
-            //local_ip = "127.0.0.1";
-            //TCP_Connection tcp = new TCP_Connection(local_ip);
+            //TCP
+            setupTCPServer();
+
         }
+
+        private void setupTCPServer()
+        {
+            server = new SimpleTcpServer();
+            server.Delimiter = 0x13; // enter
+            server.StringEncoder = Encoding.UTF8;
+            server.DataReceived += Server_DataReceived;
+        }
+
+        private void Server_DataReceived(object sender, SimpleTCP.Message e)
+        {
+            string message = e.MessageString.Remove(e.MessageString.Length - 1);
+            Console.WriteLine(e.MessageString);
+            if(message == "ch1")
+            {
+                whichChannel = 0;
+                e.Reply("OK");
+                
+            }
+            else if (message == "ch2")
+            {
+                whichChannel = 1;
+                e.Reply("OK");
+                
+            }
+            else
+            {
+                Console.WriteLine("nieznany komunikat");
+            }
+        }
+
+
+
+
 
         public void OzekiInitialization()
         {
@@ -45,16 +94,13 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         }
 
 
-
-
         void InitializeConferenceRoom()
         {
-            conferenceRoom = new ConferenceRoom();
-            conferenceRoom.StartConferencing();
-
-            conferenceRoom1 = new ConferenceRoom();
-            conferenceRoom1.StartConferencing();
-
+            for (int i =0; i<conferenceRoomlist.Count; i++)
+            {
+                conferenceRoomlist[i] = new ConferenceRoom();
+            }
+    
         }
 
 
@@ -84,36 +130,16 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             call = sender as IPhoneCall;
             if (e.State == CallState.Answered)
             {
-                if (xyz < 2)
-                {
-                    conferenceRoom.AddToConference(call);
-                    Console.WriteLine("added to conf 1");
-                    xyz++;
-                }
-                else
-                {
-                    conferenceRoom1.AddToConference(call);
-                    Console.WriteLine("added to conf 2");
-                }
-
+               
+                    conferenceRoomlist[whichChannel].AddToConference(call);
+                    Console.WriteLine("added to conf " + whichChannel);                 
             }
             else if (e.State.IsCallEnded())
             {
-                if (xyz <= 2)
-                {
-                    conferenceRoom.RemoveFromConference(call);
-                    Console.WriteLine("rem from conf 1");
-                }
-                else
-                {
-                    conferenceRoom1.RemoveFromConference(call);
-                    Console.WriteLine("rem from conf 2");
-                }
-
+               
             }
 
         }
-        
         public string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -129,9 +155,17 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
         private void button1_Click(object sender, EventArgs e)
         {
-            conferenceRoom.RemoveFromConference(callList[Int32.Parse(textBox1.Text)].call);
-            Console.WriteLine("usunieto " + callList[Int32.Parse(textBox1.Text)].call.CallID);
-            callList.RemoveAt(Int32.Parse(textBox1.Text));
+            //conferenceRoom.RemoveFromConference(callList[Int32.Parse(textBox1.Text)].call);
+            //Console.WriteLine("usunieto " + callList[Int32.Parse(textBox1.Text)].call.CallID);
+            //callList.RemoveAt(Int32.Parse(textBox1.Text));
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            
+            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.14");
+            server.Start(ip, 8910);
+            Console.WriteLine("server started");
         }
 
         [STAThread]
@@ -142,6 +176,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             Application.Run(new Server());
         }
 
+       
     }
 }
 

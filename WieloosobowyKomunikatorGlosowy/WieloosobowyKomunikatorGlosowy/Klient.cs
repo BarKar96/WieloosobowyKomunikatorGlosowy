@@ -22,17 +22,21 @@ namespace WieloosobowyKomunikatorGlosowy
         public MediaConnector connector;
         public string local_ip;
         public string server_ip;
+
+        //TCP
         public static TCP_Connection tcp;
 
 
         public Klient()
         {
            local_ip = GetLocalIPAddress();
+           OzekiInitialization();
+           SetupDevices();
+
             //local_ip = "127.0.0.1";
             //server_ip = "127.0.0.1";
-            OzekiInitialization();
-            SetupDevices();
-           // tcp = new TCP_Connection();
+
+            // tcp = new TCP_Connection();
         }
 
         public void OzekiInitialization()
