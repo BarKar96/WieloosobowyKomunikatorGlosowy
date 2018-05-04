@@ -172,7 +172,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         private void button2_Click(object sender, EventArgs e)
         {
             
-            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.28");
+            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.14");
             server.Start(ip, 8910);
             Console.WriteLine("server started");
         }

@@ -61,6 +61,12 @@
     <Compile Include="ChannelsView.Designer.cs">
       <DependentUpon>ChannelsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChannelView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChannelView.Designer.cs">
+      <DependentUpon>ChannelView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Register.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,6 +84,9 @@
     <Compile Include="TCP_Connection.cs" />
     <EmbeddedResource Include="ChannelsView.resx">
       <DependentUpon>ChannelsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChannelView.resx">
+      <DependentUpon>ChannelView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login.resx">
       <DependentUpon>Login.cs</DependentUpon>

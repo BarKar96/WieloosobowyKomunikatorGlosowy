@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,12 +22,12 @@ namespace WieloosobowyKomunikatorGlosowy
         private int nextChannel = 0;
         //tcp
         SimpleTcpClient client;
-
+        Thread th;
         public ChannelsView()
         {
             
             InitializeComponent();
-            serverIP = "192.168.1.28";
+            serverIP = "192.168.1.14";
             channelsList = new List<Channel>();
             channelsList.Add(new Channel("m", "d", "p"));
             channelsList.Add(new Channel("m", "d", "p"));
@@ -46,33 +47,43 @@ namespace WieloosobowyKomunikatorGlosowy
             client.StringEncoder = Encoding.UTF8;
             client.DataReceived += Client_DataReceived;
             client.Connect(serverIP, 8910);
+           
         }
 
         private void Client_DataReceived(object sender, SimpleTCP.Message e)
         {
+           
             Console.WriteLine("serwer odpowiedzial: "+ e.MessageString);           
             if (e.MessageString == "OK")
             {
-                k.SetupDevices();
-                k.StartCall(serverIP);
+                k.StartCall("192.168.1.14");
+                //client.Disconnect();
+                //k.CloseDevices();             
+                //this.Close();
+                //th = new Thread(openChanelView);
+                //th.SetApartmentState(ApartmentState.STA);
+                //th.Start();
+              
                
             }
+           
             if (e.MessageString == "BYE")
             {
                 k.HangUp();
             }
-            else
-            {
-                Console.WriteLine("blad przechodzenia na kanal");
-            }
+            
             //Console.WriteLine("tutaj koniec");
         }
-
+        private void openChanelView(object obj)
+        {
+            Application.Run(new ChannelView());
+        }
         private void join_button_Click(object sender, EventArgs e)
         {
             
             client.WriteLine("ch" + dataGridView1.CurrentCell.RowIndex);
             currentChannel = dataGridView1.CurrentCell.RowIndex;
+
         }
 
         private void mute_button_Click(object sender, EventArgs e)

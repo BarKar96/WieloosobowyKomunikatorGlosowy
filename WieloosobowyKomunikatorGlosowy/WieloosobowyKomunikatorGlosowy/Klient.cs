@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using Ozeki.Media;
 using Ozeki.VoIP;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace WieloosobowyKomunikatorGlosowy
 {
@@ -13,6 +14,10 @@ namespace WieloosobowyKomunikatorGlosowy
         //OZEKI
         public ISoftPhone softphone;   // softphone object
         public IPhoneLine phoneLine;   // phoneline object
+
+        public List<IPhoneLine> phoneLineList;
+
+        
         public IPhoneCall call = null;
         public string caller;
         public Microphone microphone;
@@ -30,10 +35,11 @@ namespace WieloosobowyKomunikatorGlosowy
         public Klient()
         {
            local_ip = GetLocalIPAddress();
-           OzekiInitialization();
+           phoneLineList = new List<IPhoneLine>();
+            OzekiInitialization();
 
         }
-
+        public int counter = 0;
         public void OzekiInitialization()
         {
             softphone = SoftPhoneFactory.CreateSoftPhone(5000, 10000);
@@ -43,12 +49,20 @@ namespace WieloosobowyKomunikatorGlosowy
             mediaReceiver = new PhoneCallAudioReceiver();
             connector = new MediaConnector();
 
-            var config = new DirectIPPhoneLineConfig(local_ip, 5060);
+            
+
+          
+        }
+        public void sss()
+        {
+            var config = new DirectIPPhoneLineConfig(local_ip, 5060 + counter);
             phoneLine = softphone.CreateDirectIPPhoneLine(config);
             phoneLine.RegistrationStateChanged += line_RegStateChanged;
             softphone.IncomingCall += softphone_IncomingCall;
             softphone.RegisterPhoneLine(phoneLine);
+            counter++;
         }
+       
         public void line_RegStateChanged(object sender, RegistrationStateChangedArgs e)
         {
 
@@ -66,11 +80,14 @@ namespace WieloosobowyKomunikatorGlosowy
         }
         public void StartCall(string numberToDial)
         {
-            SetupDevices();
+
+            sss();
             if (call == null)
             {
+               
                 Console.WriteLine("starting call");
                 call = softphone.CreateDirectIPCallObject(phoneLine, new DirectIPDialParameters("5060"), numberToDial);
+      
                 call.CallStateChanged += call_CallStateChanged;
                 call.Start();
                 Console.WriteLine(call.CallID);
@@ -79,10 +96,11 @@ namespace WieloosobowyKomunikatorGlosowy
         }
         public void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
         {
+           
             call = e.Item;
             caller = call.DialInfo.CallerID;
             call.CallStateChanged += call_CallStateChanged;
-            SetupDevices();
+           
             call.Answer();
             
         }
@@ -99,25 +117,37 @@ namespace WieloosobowyKomunikatorGlosowy
             if (e.State.IsCallEnded())
                 CloseDevices();
         }
+        int x = 0;
         public void SetupDevices()
         {
+            
+            if (x > 0)
+            {
+                OzekiInitialization();
+            }
             Console.WriteLine("setupDevices");
+
+            x++;
             microphone.Start();
             connector.Connect(microphone, mediaSender);
+
             speaker.Start();
             connector.Connect(mediaReceiver, speaker);
+
             mediaSender.AttachToCall(call);
             mediaReceiver.AttachToCall(call);
         }
         public void CloseDevices()
         {
             Console.WriteLine("closeDevices");
-            //phoneLine.Dispose();
+            phoneLine.Dispose();
             microphone.Dispose();
             speaker.Dispose();
             mediaReceiver.Detach();
             mediaSender.Detach();
             connector.Dispose();
+
+            
         }
 
         public string GetLocalIPAddress()
@@ -136,7 +166,9 @@ namespace WieloosobowyKomunikatorGlosowy
         {         
             if (call != null)
             {
+                
                 call.HangUp();
+                call.PhoneLine.Dispose();
                 call.CallStateChanged += call_CallStateChanged;
                 call = null; 
             }
@@ -145,7 +177,7 @@ namespace WieloosobowyKomunikatorGlosowy
                 Console.WriteLine("call = null");
             }
         }
-
+      
         [STAThread]
         public static void Main()
         {
