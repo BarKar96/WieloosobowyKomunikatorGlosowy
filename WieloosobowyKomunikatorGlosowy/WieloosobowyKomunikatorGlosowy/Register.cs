@@ -30,7 +30,7 @@ namespace WieloosobowyKomunikatorGlosowy
         }
         public Register()
         {
-            Klient k = new Klient();
+            Klient k = new Klient("bartek");
             InitializeComponent();
             
         }

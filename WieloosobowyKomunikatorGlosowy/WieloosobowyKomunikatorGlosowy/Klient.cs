@@ -10,6 +10,7 @@ namespace WieloosobowyKomunikatorGlosowy
 {
     public class Klient
     {
+        public string name;
 
         //OZEKI
         public ISoftPhone softphone;   // softphone object
@@ -32,8 +33,9 @@ namespace WieloosobowyKomunikatorGlosowy
         public static TCP_Connection tcp;
 
 
-        public Klient()
+        public Klient(string name)
         {
+            this.name = name;
            local_ip = GetLocalIPAddress();
            phoneLineList = new List<IPhoneLine>();
             OzekiInitialization();
@@ -53,7 +55,7 @@ namespace WieloosobowyKomunikatorGlosowy
 
           
         }
-        public void sss()
+        public void phoneLineInitialization()
         {
             var config = new DirectIPPhoneLineConfig(local_ip, 5060 + counter);
             phoneLine = softphone.CreateDirectIPPhoneLine(config);
@@ -81,7 +83,7 @@ namespace WieloosobowyKomunikatorGlosowy
         public void StartCall(string numberToDial)
         {
 
-            sss();
+            phoneLineInitialization();
             if (call == null)
             {
                

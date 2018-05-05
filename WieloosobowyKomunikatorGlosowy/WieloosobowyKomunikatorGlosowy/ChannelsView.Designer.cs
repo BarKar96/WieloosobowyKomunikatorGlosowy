@@ -40,6 +40,12 @@
             this.refresh_button = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.btn_endCall = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.lb_UserList = new System.Windows.Forms.ListBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -80,7 +86,6 @@
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(344, 369);
             this.dataGridView1.TabIndex = 0;
-            
             // 
             // Nazwa
             // 
@@ -132,7 +137,7 @@
             // 
             // refresh_button
             // 
-            this.refresh_button.Location = new System.Drawing.Point(376, 31);
+            this.refresh_button.Location = new System.Drawing.Point(384, 329);
             this.refresh_button.Name = "refresh_button";
             this.refresh_button.Size = new System.Drawing.Size(75, 23);
             this.refresh_button.TabIndex = 4;
@@ -142,7 +147,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(723, 31);
+            this.button2.Location = new System.Drawing.Point(585, 329);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 6;
@@ -152,7 +157,7 @@
             // 
             // btn_endCall
             // 
-            this.btn_endCall.Location = new System.Drawing.Point(376, 86);
+            this.btn_endCall.Location = new System.Drawing.Point(384, 377);
             this.btn_endCall.Name = "btn_endCall";
             this.btn_endCall.Size = new System.Drawing.Size(75, 23);
             this.btn_endCall.TabIndex = 7;
@@ -160,12 +165,71 @@
             this.btn_endCall.UseVisualStyleBackColor = true;
             this.btn_endCall.Click += new System.EventHandler(this.btn_endCall_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(393, 31);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(80, 13);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Nazwa kanału:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(498, 31);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(35, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "label2";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(394, 65);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(68, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Opis kanału:";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(393, 101);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(90, 13);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "Osoby na kanale:";
+            // 
+            // lb_UserList
+            // 
+            this.lb_UserList.FormattingEnabled = true;
+            this.lb_UserList.Location = new System.Drawing.Point(396, 132);
+            this.lb_UserList.Name = "lb_UserList";
+            this.lb_UserList.Size = new System.Drawing.Size(117, 173);
+            this.lb_UserList.TabIndex = 12;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(498, 65);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(35, 13);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "label5";
+            // 
             // ChannelsView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(953, 459);
             this.ControlBox = false;
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.lb_UserList);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.btn_endCall);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.refresh_button);
@@ -178,6 +242,7 @@
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -195,6 +260,12 @@
         private System.Windows.Forms.Button refresh_button;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button btn_endCall;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ListBox lb_UserList;
+        private System.Windows.Forms.Label label5;
     }
 }
 

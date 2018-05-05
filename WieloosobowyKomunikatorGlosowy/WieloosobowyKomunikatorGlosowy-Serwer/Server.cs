@@ -15,17 +15,16 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
     public partial class Server : Form
     {
 
-        //Ozeki
-        static int xyz = 0;
+        //Ozeki      
         public IPhoneCall call;
         public ISoftPhone softphone;   // softphone object
         public IPhoneLine phoneLine;
         public string local_ip;
 
-        public List<ConferenceRoom> conferenceRoomlist;
+        private List<Channel> channelList;
 
-      
 
+        string temp_name = null;
         public int whichChannel = -1;
 
         //TCP
@@ -39,18 +38,19 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             local_ip = GetLocalIPAddress();
             OzekiInitialization();
             //InitializeConferenceRoom();
-            conferenceRoomlist = new List<ConferenceRoom>();
+            channelList = new List<Channel>();
 
-            conferenceRoomlist.Add(new ConferenceRoom());
-            conferenceRoomlist.Add(new ConferenceRoom());
-            conferenceRoomlist.Add(new ConferenceRoom());
-            conferenceRoomlist.Add(new ConferenceRoom());
+            channelList.Add(new Channel("a","a","a"));
+            channelList.Add(new Channel("b", "b", "b"));
+            channelList.Add(new Channel("c", "c", "c"));
+            channelList.Add(new Channel("d", "d", "d"));
 
             //TCP
             setupTCPServer();
+           
+            
 
         }
-
         private void setupTCPServer()
         {
             server = new SimpleTcpServer();
@@ -58,45 +58,66 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             server.StringEncoder = Encoding.UTF8;
             server.DataReceived += Server_DataReceived;
         }
+        public string sendChannelInfo()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("CHB;|");
+            foreach(Channel ch in channelList)
+            {
+                sb.Append(ch.name);
+                sb.Append(";");
+                sb.Append(ch.description);
+                sb.Append(";");
+                sb.Append(ch.password);
+                sb.Append("|");
+            }
+            return sb.ToString();
 
+        }
+        public void buildChannelMessageInfo()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("CHI");
+            sb.Append(";");
+            sb.Append(whichChannel);
+            sb.Append(";");
+            sb.Append(channelList[whichChannel].name);
+            sb.Append(";");
+            sb.Append(channelList[whichChannel].description);
+            sb.Append(";");
+            sb.Append(channelList[whichChannel].password);
+            foreach (User u in channelList[whichChannel].userList)
+            {
+                sb.Append(";");
+                sb.Append(u.name);
+            }
+            
+            server.Broadcast(sb.ToString());
+        }
         private void Server_DataReceived(object sender, SimpleTCP.Message e)
         {
             string message = e.MessageString.Remove(e.MessageString.Length - 1);
-            Console.WriteLine(message);
-            if(message == "ch0")
+           
+            Char delimiter = ';';
+            String[] substrings = message.Split(delimiter);
+
+            //Console.WriteLine(message);
+            if (substrings[0] == "HI")
             {
-                whichChannel = 0;
+                e.Reply(sendChannelInfo());
+
+            }
+            else if(substrings[1] == "CH")
+            {
+                whichChannel = Int32.Parse(substrings[2]);
+                temp_name = substrings[0];
                 e.Reply("OK");
                 
-            }
-            else if (message == "ch1")
+            }               
+            else if (substrings[1] == "BYE")
             {
-                whichChannel = 1;
-                e.Reply("OK");                
-            }
-            else if (message == "ch2")
-            {
-                whichChannel = 2;
-                e.Reply("OK");
-            }
-            else if (message == "ch3")
-            {
-                whichChannel = 3;
-                e.Reply("OK");
-            }
-            else if (message == "BYE0")
-            {
-                whichChannel = 0;
-                e.Reply("BYE");
-            }
-            else if (message == "BYE1")
-            {
-                whichChannel = 1;
-                e.Reply("BYE");
-            }
-            else if (message == "BYE2")
-            {
-                whichChannel = 2;
+                whichChannel = Int32.Parse(substrings[2]);
+                temp_name = substrings[0];
                 e.Reply("BYE");
             }
             else
@@ -104,10 +125,6 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                 Console.WriteLine("nieznany komunikat");
             }
         }
-
-
-
-
 
         public void OzekiInitialization()
         {
@@ -145,16 +162,21 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             call = sender as IPhoneCall;
             if (e.State == CallState.Answered)
             {
-                conferenceRoomlist[whichChannel].AddToConference(call);
-                Console.WriteLine("added to channel " + whichChannel);                 
+                channelList[whichChannel].conferenceRoom.AddToConference(call);
+                channelList[whichChannel].addUser(new User(temp_name, call.CallID));
+                Console.WriteLine(temp_name + " added to channel: " + whichChannel);
+                buildChannelMessageInfo();
+                
             }
             else if (e.State.IsCallEnded())
             {
-                conferenceRoomlist[whichChannel].RemoveFromConference(call);
-                Console.WriteLine("removed from channel " + whichChannel);
+                channelList[whichChannel].conferenceRoom.RemoveFromConference(call);
+                channelList[whichChannel].remUser(call.CallID);
+                Console.WriteLine(temp_name + " removed from channel: " + whichChannel);
             }
 
         }
+        
         public string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -172,7 +194,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         private void button2_Click(object sender, EventArgs e)
         {
             
-            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.14");
+            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.15");
             server.Start(ip, 8910);
             Console.WriteLine("server started");
         }
