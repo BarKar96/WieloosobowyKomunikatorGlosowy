@@ -25,7 +25,8 @@ namespace WieloosobowyKomunikatorGlosowy
         {
             
             InitializeComponent();
-            serverIP = "192.168.1.15";
+            //serverIP = "192.168.1.15";
+            serverIP = "192.168.0.100";
             channelList = new List<Channel>();
 
             
@@ -44,7 +45,7 @@ namespace WieloosobowyKomunikatorGlosowy
             client = new SimpleTcpClient();
             client.StringEncoder = Encoding.UTF8;
             client.DataReceived += Client_DataReceived;
-            client.Connect(serverIP, 8910);
+            client.Connect(serverIP, 8910); //przydałby się jakiś try catch jakby serwer był wyłączony
            
         }
 
@@ -57,6 +58,10 @@ namespace WieloosobowyKomunikatorGlosowy
             if (e.MessageString == "OK")
             {
                 k.StartCall(serverIP);
+            }
+            if (e.MessageString == "NOK")
+            {
+                MessageBox.Show("Hasło niepoprawne. Spróbuj ponownie.");
             }
             if (e.MessageString == "BYE")
             {
@@ -84,7 +89,10 @@ namespace WieloosobowyKomunikatorGlosowy
                 for (int i = 1; i<strings.Length-1; i++)
                 {
                     String[] temp = strings[i].Split(de);
-                    channelList.Add(new Channel(temp[0], temp[1], temp[2]));
+                    bool password = false;
+                    if (temp[3] == "T")
+                        password = true;
+                    channelList.Add(new Channel(temp[0], temp[1], temp[2], password));
                     Console.WriteLine("add " + temp[0]);
                 }
                 refreshGridView();
@@ -94,10 +102,14 @@ namespace WieloosobowyKomunikatorGlosowy
         }
         private void join_button_Click(object sender, EventArgs e)
         {
-            
-            client.WriteLine(k.name + ";CH;" + dataGridView1.CurrentCell.RowIndex);
+            string password = "";
             currentChannel = dataGridView1.CurrentCell.RowIndex;
-
+            DataGridViewCheckBoxCell chechbox = dataGridView1.Rows[currentChannel].Cells["Haslo"] as DataGridViewCheckBoxCell;
+            if (Convert.ToBoolean(chechbox.Value))
+            {
+                password = Prompt.ShowDialog("Hasło wymagane", "Podaj hasło");
+            }
+            client.WriteLine(k.name + ";CH;" + dataGridView1.CurrentCell.RowIndex + ";" + SHA.ChangeToSHA2_256(password) + ";"); 
         }
 
         private void mute_button_Click(object sender, EventArgs e)
@@ -112,7 +124,9 @@ namespace WieloosobowyKomunikatorGlosowy
 
         private void logout_button_Click(object sender, EventArgs e)
         {
-        
+            this.Hide();
+            Login log = new Login();
+            log.ShowDialog();
         }
         private void refreshGridView()
         {
@@ -120,14 +134,7 @@ namespace WieloosobowyKomunikatorGlosowy
             this.dataGridView1.Rows.Clear();
             foreach (Channel ch in channelList)
             {
-                if (ch.password == null)
-                {
-                    dataGridView1.Rows.Add(ch.name, ch.description, ch.password, false);
-                }
-                else
-                {
-                    dataGridView1.Rows.Add(ch.name, ch.description, ch.password, true);
-                }
+                dataGridView1.Rows.Add(ch.name, ch.number_user, ch.description, ch.password);
             }
             
         }
@@ -150,7 +157,5 @@ namespace WieloosobowyKomunikatorGlosowy
             lb_UserList.Items.Clear();
             client.WriteLine(k.name+";BYE;"+ currentChannel);
         }
-
-
     }
 }

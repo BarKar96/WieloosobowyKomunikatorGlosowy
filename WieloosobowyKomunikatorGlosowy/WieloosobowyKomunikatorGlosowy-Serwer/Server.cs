@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Security.Cryptography;
 
 namespace WieloosobowyKomunikatorGlosowy_Serwer
 {
@@ -33,7 +34,6 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         public Server()
         {    
             InitializeComponent();
-            
             //Ozeki
             local_ip = GetLocalIPAddress();
             OzekiInitialization();
@@ -66,9 +66,14 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             {
                 sb.Append(ch.name);
                 sb.Append(";");
+                sb.Append(ch.userList.Count);
+                sb.Append(";");
                 sb.Append(ch.description);
                 sb.Append(";");
-                sb.Append(ch.password);
+                if (ch.password == ChangeToSHA2_256(""))
+                    sb.Append("F");
+                else
+                    sb.Append("T");
                 sb.Append("|");
             }
             return sb.ToString();
@@ -83,9 +88,9 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             sb.Append(";");
             sb.Append(channelList[whichChannel].name);
             sb.Append(";");
-            sb.Append(channelList[whichChannel].description);
+            sb.Append(channelList[whichChannel].userList.Count);
             sb.Append(";");
-            sb.Append(channelList[whichChannel].password);
+            sb.Append(channelList[whichChannel].description);
             foreach (User u in channelList[whichChannel].userList)
             {
                 sb.Append(";");
@@ -97,10 +102,8 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         private void Server_DataReceived(object sender, SimpleTCP.Message e)
         {
             string message = e.MessageString.Remove(e.MessageString.Length - 1);
-           
             Char delimiter = ';';
             String[] substrings = message.Split(delimiter);
-
             //Console.WriteLine(message);
             if (substrings[0] == "HI")
             {
@@ -111,8 +114,11 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             {
                 whichChannel = Int32.Parse(substrings[2]);
                 temp_name = substrings[0];
-                e.Reply("OK");
-                
+                if (channelList[whichChannel].password == substrings[3])
+                    e.Reply("OK");
+                else
+                    e.Reply("NOK");
+
             }               
             else if (substrings[1] == "BYE")
             {
@@ -193,11 +199,45 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
-            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.15");
+
+            //System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.15");
+            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.0.100");
             server.Start(ip, 8910);
             Console.WriteLine("server started");
         }
+
+
+        private string ChangeToSHA2_256(string input)
+        {
+            using (SHA256Managed sha1 = new SHA256Managed())
+            {
+                var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(input));
+                var sb = new StringBuilder(hash.Length * 2);
+
+                foreach (byte b in hash)
+                {
+                    sb.Append(b.ToString("X2"));
+                }
+                string result = sb.ToString();
+                return result.ToLower();
+            }
+        }
+
+
+        private void add_channel_Click(object sender, EventArgs e)
+        {
+            if (channelList.Exists(x => x.name == name_box.Text))
+                MessageBox.Show("Istnieje kanał o tej samej nazwie");
+            else
+            {
+                channelList.Add(new Channel(name_box.Text, description_box.Text, ChangeToSHA2_256(password_box.Text)));
+                MessageBox.Show("Dodano kanał");
+                name_box.Clear();
+                description_box.Clear();
+                password_box.Clear();
+            }
+        }
+
 
         [STAThread]
         static void Main()
@@ -206,8 +246,6 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Server());
         }
-
-       
     }
 }
 

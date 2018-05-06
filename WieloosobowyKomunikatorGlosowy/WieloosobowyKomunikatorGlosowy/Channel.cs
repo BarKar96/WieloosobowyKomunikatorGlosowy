@@ -10,17 +10,19 @@ namespace WieloosobowyKomunikatorGlosowy
     class Channel
     {
         public string name;
+        public string number_user;
         public string description;
-        public string password;     
+        public bool password;
         public List<User> userList;
-        public Channel(string name, string description, string password)
+        public Channel(string name, string number_user, string description, bool password)
         {
             this.name = name;
+            this.number_user = number_user;
             this.description = description;
             this.password = password;           
             this.userList = new List<User>();
 
-          
+
         }
     }
 }

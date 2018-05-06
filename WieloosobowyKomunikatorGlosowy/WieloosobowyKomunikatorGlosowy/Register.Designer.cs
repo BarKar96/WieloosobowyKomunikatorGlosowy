@@ -52,6 +52,7 @@ namespace WieloosobowyKomunikatorGlosowy
             this.text_password.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.text_password.Location = new System.Drawing.Point(120, 73);
             this.text_password.Name = "text_password";
+            this.text_password.PasswordChar = '*';
             this.text_password.Size = new System.Drawing.Size(152, 20);
             this.text_password.TabIndex = 12;
             // 
@@ -105,6 +106,7 @@ namespace WieloosobowyKomunikatorGlosowy
             this.TextRepeatPassword.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.TextRepeatPassword.Location = new System.Drawing.Point(120, 121);
             this.TextRepeatPassword.Name = "TextRepeatPassword";
+            this.TextRepeatPassword.PasswordChar = '*';
             this.TextRepeatPassword.Size = new System.Drawing.Size(152, 20);
             this.TextRepeatPassword.TabIndex = 14;
             // 

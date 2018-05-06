@@ -108,6 +108,7 @@ namespace WieloosobowyKomunikatorGlosowy
             this.text_password.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.text_password.Location = new System.Drawing.Point(120, 87);
             this.text_password.Name = "text_password";
+            this.text_password.PasswordChar = '*';
             this.text_password.Size = new System.Drawing.Size(152, 20);
             this.text_password.TabIndex = 4;
             // 
