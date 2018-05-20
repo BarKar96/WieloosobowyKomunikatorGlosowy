@@ -29,9 +29,6 @@ namespace WieloosobowyKomunikatorGlosowy
         public string local_ip;
         public string server_ip;
 
-        //TCP
-        public static TCP_Connection tcp;
-
 
         public Klient(string name)
         {
@@ -185,7 +182,7 @@ namespace WieloosobowyKomunikatorGlosowy
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ChannelsView());
+            Application.Run(new Server_IP());
         }
     }
 }

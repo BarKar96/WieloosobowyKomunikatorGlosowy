@@ -20,33 +20,25 @@ namespace WieloosobowyKomunikatorGlosowy
         private string serverIP;
         private int currentChannel = 0;
         //tcp
-        SimpleTcpClient client;
-        public ChannelsView()
+        private SimpleTcpClient client;
+        public ChannelsView(string serverIP)
         {
             
             InitializeComponent();
-            //serverIP = "192.168.1.15";
-            serverIP = "192.168.0.100";
+            this.serverIP = serverIP;
             channelList = new List<Channel>();
 
             
             //Ozeki
             k = new Klient("bartek");
             //TCP
-            SetupTCPClient();
-            
+            client = new SimpleTcpClient();
+            client.StringEncoder = Encoding.UTF8;
+            client.Connect(serverIP, 8910);
+            client.DataReceived += Client_DataReceived;
             client.WriteLine("HI;");
             
             
-        }
-
-        private void SetupTCPClient()
-        {
-            client = new SimpleTcpClient();
-            client.StringEncoder = Encoding.UTF8;
-            client.DataReceived += Client_DataReceived;
-            client.Connect(serverIP, 8910); //przydałby się jakiś try catch jakby serwer był wyłączony
-           
         }
 
         private void Client_DataReceived(object sender, SimpleTCP.Message e)
@@ -55,11 +47,11 @@ namespace WieloosobowyKomunikatorGlosowy
             String[] substrings = e.MessageString.Split(delimiter);
 
             Console.WriteLine("serwer odpowiedzial: " + e.MessageString);
-            if (e.MessageString == "OK")
+            if (e.MessageString == "PASSOK")
             {
                 k.StartCall(serverIP);
             }
-            if (e.MessageString == "NOK")
+            if (e.MessageString == "PASSNOK")
             {
                 MessageBox.Show("Hasło niepoprawne. Spróbuj ponownie.");
             }
@@ -86,7 +78,7 @@ namespace WieloosobowyKomunikatorGlosowy
                 String[] strings = e.MessageString.Split(de);
                 de = ';';
                 Console.WriteLine(strings.Length);
-                for (int i = 1; i<strings.Length-1; i++)
+                for (int i = 1; i < strings.Length - 1; i++)
                 {
                     String[] temp = strings[i].Split(de);
                     bool password = false;
@@ -125,16 +117,31 @@ namespace WieloosobowyKomunikatorGlosowy
         private void logout_button_Click(object sender, EventArgs e)
         {
             this.Hide();
+            client.DataReceived -= Client_DataReceived;
             Login log = new Login();
-            log.ShowDialog();
+            log.Show();
         }
         private void refreshGridView()
         {
-            this.dataGridView1.DataSource = null;
-            this.dataGridView1.Rows.Clear();
-            foreach (Channel ch in channelList)
+            dataGridView1.DataSource = null;
+            if (InvokeRequired)
             {
-                dataGridView1.Rows.Add(ch.name, ch.number_user, ch.description, ch.password);
+                Invoke(new Action(() =>
+                {
+                    dataGridView1.Rows.Clear();
+                    foreach (Channel ch in channelList)
+                    {
+                        dataGridView1.Rows.Add(ch.name, ch.number_user, ch.description, ch.password);
+                    }
+                }));
+            }
+            else
+            {
+                dataGridView1.Rows.Clear();
+                foreach (Channel ch in channelList)
+                {
+                    dataGridView1.Rows.Add(ch.name, ch.number_user, ch.description, ch.password);
+                }
             }
             
         }

@@ -28,8 +28,12 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         string temp_name = null;
         public int whichChannel = -1;
 
+
         //TCP
         SimpleTcpServer server;
+
+        //Database
+        Database database;
        
         public Server()
         {    
@@ -40,14 +44,14 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             //InitializeConferenceRoom();
             channelList = new List<Channel>();
 
-            channelList.Add(new Channel("a","a","a"));
-            channelList.Add(new Channel("b", "b", "b"));
-            channelList.Add(new Channel("c", "c", "c"));
-            channelList.Add(new Channel("d", "d", "d"));
+            channelList.Add(new Channel("a","a", ChangeToSHA2_256("a")));
+            channelList.Add(new Channel("b", "b", ChangeToSHA2_256("b")));
+            channelList.Add(new Channel("c", "c", ChangeToSHA2_256("c")));
+            channelList.Add(new Channel("d", "d", ChangeToSHA2_256("d")));
 
             //TCP
             setupTCPServer();
-           
+            this.database = new Database();       
             
 
         }
@@ -104,7 +108,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             string message = e.MessageString.Remove(e.MessageString.Length - 1);
             Char delimiter = ';';
             String[] substrings = message.Split(delimiter);
-            //Console.WriteLine(message);
+            Console.WriteLine(message);
             if (substrings[0] == "HI")
             {
                 e.Reply(sendChannelInfo());
@@ -115,9 +119,9 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                 whichChannel = Int32.Parse(substrings[2]);
                 temp_name = substrings[0];
                 if (channelList[whichChannel].password == substrings[3])
-                    e.Reply("OK");
+                    e.Reply("PASSOK");
                 else
-                    e.Reply("NOK");
+                    e.Reply("PASSNOK");
 
             }               
             else if (substrings[1] == "BYE")
@@ -125,6 +129,22 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                 whichChannel = Int32.Parse(substrings[2]);
                 temp_name = substrings[0];
                 e.Reply("BYE");
+            }
+            else if (substrings[0] == "REG")
+            {
+                bool answer = database.AddUser(substrings[1], substrings[2]);
+                if (answer == true)
+                    e.Reply("REGOK");
+                else
+                    e.Reply("REGNOK");
+            }
+            else if (substrings[0] == "LOG")
+            {
+                bool answer = database.CheckPassword(substrings[1], substrings[2]);
+                if (answer == true)
+                    e.Reply("LOGOK");
+                else
+                    e.Reply("LOGNOK");
             }
             else
             {
@@ -201,7 +221,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         {
 
             //System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.15");
-            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.0.100");
+            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.0.106");
             server.Start(ip, 8910);
             Console.WriteLine("server started");
         }
