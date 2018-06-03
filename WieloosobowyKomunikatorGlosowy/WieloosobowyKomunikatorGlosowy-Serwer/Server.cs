@@ -42,16 +42,15 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             local_ip = GetLocalIPAddress();
             OzekiInitialization();
             //InitializeConferenceRoom();
-            channelList = new List<Channel>();
-
-            channelList.Add(new Channel("a","a", ChangeToSHA2_256("a")));
-            channelList.Add(new Channel("b", "b", ChangeToSHA2_256("b")));
-            channelList.Add(new Channel("c", "c", ChangeToSHA2_256("c")));
-            channelList.Add(new Channel("d", "d", ChangeToSHA2_256("d")));
-
+            this.database = new Database();
+            channelList = database.GetChannelList();
+            foreach (Channel channel in channelList)
+            {
+                listBox1.Items.Add(channel.GetName());
+            }
             //TCP
             setupTCPServer();
-            this.database = new Database();       
+                 
             
 
         }
@@ -219,9 +218,8 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
         private void button2_Click(object sender, EventArgs e)
         {
-
-            //System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.15");
-            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.0.106");
+            System.Net.IPAddress ip = System.Net.IPAddress.Parse(GetLocalIPAddress());
+            Console.WriteLine(GetLocalIPAddress());
             server.Start(ip, 8910);
             Console.WriteLine("server started");
         }
@@ -246,15 +244,24 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
         private void add_channel_Click(object sender, EventArgs e)
         {
-            if (channelList.Exists(x => x.name == name_box.Text))
-                MessageBox.Show("Istnieje kanał o tej samej nazwie");
+            if (name_box.Text == "")
+            {
+                MessageBox.Show("Pole nazwa nie może być puste");
+            }
             else
             {
-                channelList.Add(new Channel(name_box.Text, description_box.Text, ChangeToSHA2_256(password_box.Text)));
-                MessageBox.Show("Dodano kanał");
-                name_box.Clear();
-                description_box.Clear();
-                password_box.Clear();
+                bool answer = database.AddChannel(name_box.Text, description_box.Text, ChangeToSHA2_256(password_box.Text));
+                if (channelList.Exists(x => x.name == name_box.Text) || answer == false)
+                    MessageBox.Show("Istnieje kanał o tej samej nazwie");
+                else
+                {
+                    channelList.Add(new Channel(name_box.Text, description_box.Text, ChangeToSHA2_256(password_box.Text)));
+                    listBox1.Items.Add(name_box.Text);
+                    MessageBox.Show("Dodano kanał");
+                    name_box.Clear();
+                    description_box.Clear();
+                    password_box.Clear();
+                }
             }
         }
 

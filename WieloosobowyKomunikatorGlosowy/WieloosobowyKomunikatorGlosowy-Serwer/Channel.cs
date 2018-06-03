@@ -41,5 +41,9 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }
             
         }
+        public string GetName()
+        {
+            return name;
+        }
     }
 }

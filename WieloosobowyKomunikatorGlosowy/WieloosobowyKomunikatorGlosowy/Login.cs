@@ -15,6 +15,7 @@ namespace WieloosobowyKomunikatorGlosowy
     {
         SimpleTcpClient client;
         public static string serverIP;
+        public string login_name;
         public Login()
         {
             InitializeComponent();
@@ -33,7 +34,7 @@ namespace WieloosobowyKomunikatorGlosowy
             if (e.MessageString == "LOGOK")
             {
                 client.DataReceived -= Client_DataReceived;
-                ChannelsView frm = new ChannelsView(serverIP);
+                ChannelsView frm = new ChannelsView(serverIP, login_name);
                 if (InvokeRequired)
                 {
                     Invoke(new Action(() =>
@@ -71,6 +72,7 @@ namespace WieloosobowyKomunikatorGlosowy
             else
             {
                 client.WriteLine("LOG;" + login + ";" + password);
+                login_name = login;
             }
         }
 

@@ -21,7 +21,7 @@ namespace WieloosobowyKomunikatorGlosowy
         private int currentChannel = 0;
         //tcp
         private SimpleTcpClient client;
-        public ChannelsView(string serverIP)
+        public ChannelsView(string serverIP, string login)
         {
             
             InitializeComponent();
@@ -30,7 +30,7 @@ namespace WieloosobowyKomunikatorGlosowy
 
             
             //Ozeki
-            k = new Klient("bartek");
+            k = new Klient(login);
             //TCP
             client = new SimpleTcpClient();
             client.StringEncoder = Encoding.UTF8;
