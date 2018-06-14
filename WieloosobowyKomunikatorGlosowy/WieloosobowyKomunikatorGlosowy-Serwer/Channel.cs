@@ -41,6 +41,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }
             
         }
+
         public void remUser1(string name)
         {
 
@@ -52,6 +53,11 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                     break;
                 }
             }
+
+
+        public string GetName()
+        {
+            return name;
 
         }
     }

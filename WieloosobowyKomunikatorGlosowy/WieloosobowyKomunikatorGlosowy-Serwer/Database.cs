@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data.SQLite;
-using System.Security.Cryptography;
-using System.Text;
+using System.Collections.Generic;
 
 namespace WieloosobowyKomunikatorGlosowy_Serwer
 {
@@ -19,7 +18,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             SQLiteCommand command = new SQLiteCommand(sql, m_dbconnection);
             command.ExecuteNonQuery();
             sql = "create table users (user_id integer primary key autoincrement not null, user_name varchar(25) not null unique, password varchar(32) not null," +
-                " ip_adress varchar(15), channel_id integer, foreign key (channel_id) references channels(channel_id))";
+                " channel_id integer, foreign key (channel_id) references channels(channel_id))";
             command = new SQLiteCommand(sql, m_dbconnection);
             command.ExecuteNonQuery();
             m_dbconnection.Close();
@@ -31,7 +30,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         public Database()
         {
             m_dbconnection = new SQLiteConnection("data source=communicator_database.sqlite;version=3;");
-            m_dbconnection.Open();
+            m_dbconnection.Open();           
         }
 
         public bool AddUser(string login, string password)
@@ -46,7 +45,6 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }
             catch
             {
-                Console.WriteLine("login istnieje");
                 return false;
             }
         }
@@ -98,11 +96,54 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }
         }
 
-        private void setip(string login, string ip)
+        public bool AddChannel(string channel_name, string password, string description)
         {
-            command = new SQLiteCommand("update users set ip_adress = $ip_adress where user_name=$login", m_dbconnection);
+            try
+            {
+                command = new SQLiteCommand("insert into channels(channel_name, password, description) " +
+                    "values($channel_name, $password, $description)", m_dbconnection);
+                command.Parameters.AddWithValue("$channel_name", channel_name);
+                command.Parameters.AddWithValue("$password", password);
+                command.Parameters.AddWithValue("$description", description);
+                command.ExecuteNonQuery();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public List<Channel> GetChannelList()
+        {
+            List<Channel> channelList = new List<Channel>();
+            command = new SQLiteCommand("select * from channels", m_dbconnection);
+            reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                channelList.Add(new Channel(reader["channel_name"].ToString(), reader["password"].ToString(),
+                    reader["description"].ToString()));
+            }
+            return channelList;
+        }
+
+        public void AddUserToChannel(string login, string channel_name)
+        {
+            command = new SQLiteCommand("select channel_id from channels where channel_name=$channel_name", m_dbconnection);
+            reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                int channel_id = Int32.Parse(reader["channel_id"].ToString());
+                command = new SQLiteCommand("update users set channel_id = $channel_id where user_name=$login", m_dbconnection);
+                command.Parameters.AddWithValue("$login", login);
+                command.Parameters.AddWithValue("$channel_id", channel_id);
+                command.ExecuteNonQuery();
+            }
+        }
+        public void RemoveUserFromChannel(string login)
+        {
+            command = new SQLiteCommand("update users set channel_id = NULL where user_name=$login", m_dbconnection);
             command.Parameters.AddWithValue("$login", login);
-            command.Parameters.AddWithValue("$ip_adress", ip);
             command.ExecuteNonQuery();
         }
     }
