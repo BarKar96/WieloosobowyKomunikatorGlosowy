@@ -14,6 +14,9 @@ namespace WieloosobowyKomunikatorGlosowy
 {
     public partial class ChannelsView : Form
     {
+        private static System.Media.SoundPlayer ring { get; set; }
+        private static System.Media.SoundPlayer ring2 { get; set; }
+        private static System.Media.SoundPlayer ring3 { get; set; }
         //ozeki
         private List<Channel> channelList;
         private Klient k;
@@ -28,7 +31,15 @@ namespace WieloosobowyKomunikatorGlosowy
             this.serverIP = serverIP;
             channelList = new List<Channel>();
 
-            
+            ring = new System.Media.SoundPlayer();
+            ring.SoundLocation = "q.wav";
+
+            ring2 = new System.Media.SoundPlayer();
+            ring2.SoundLocation = "beep.wav";
+
+            ring3 = new System.Media.SoundPlayer();
+            ring3.SoundLocation = "neck.wav";
+
             //Ozeki
             k = new Klient("bartek");
             //TCP
@@ -37,8 +48,11 @@ namespace WieloosobowyKomunikatorGlosowy
             client.Connect(serverIP, 8910);
             client.DataReceived += Client_DataReceived;
             client.WriteLine("HI;");
-            
-            
+
+            label5.Text = "0";
+
+
+
         }
 
         private void Client_DataReceived(object sender, SimpleTCP.Message e)
@@ -63,13 +77,24 @@ namespace WieloosobowyKomunikatorGlosowy
             {
                 if (currentChannel == Int32.Parse(substrings[1]))
                 {
+                    if (Int32.Parse(substrings[3]) > Int32.Parse(label5.Text))
+                    {
+                        ring2.Play();
+                    }
+                    else
+                    {
+                        ring3.Play();
+                    }
                     label2.Text = substrings[2];
                     label5.Text = substrings[3];
 
+                    lb_UserList.Items.Clear();
                     for (int i = 5; i < substrings.Length; i++)
                     {
                         lb_UserList.Items.Add(substrings[i]);
                     }
+                    refreshGridView();
+
                 }
             }
             if (substrings[0] == "CHB")
@@ -94,6 +119,7 @@ namespace WieloosobowyKomunikatorGlosowy
         }
         private void join_button_Click(object sender, EventArgs e)
         {
+           
             string password = "";
             currentChannel = dataGridView1.CurrentCell.RowIndex;
             DataGridViewCheckBoxCell chechbox = dataGridView1.Rows[currentChannel].Cells["Haslo"] as DataGridViewCheckBoxCell;
@@ -103,14 +129,20 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             client.WriteLine(k.name + ";CH;" + dataGridView1.CurrentCell.RowIndex + ";" + SHA.ChangeToSHA2_256(password) + ";"); 
         }
-
+        public bool mute = false;
         private void mute_button_Click(object sender, EventArgs e)
         {
-            foreach (Channel ch in channelList)
+            if (mute == false)
             {
-                Console.WriteLine(ch.name);
+                k.CloseDevices();
+                mute = true;
             }
-                refreshGridView();
+            else
+            {
+                k.SetupDevices();
+                mute = false;
+            }
+            
 
         }
 

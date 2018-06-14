@@ -13,6 +13,7 @@ namespace WieloosobowyKomunikatorGlosowy
 {
     public partial class Login : Form
     {
+
         SimpleTcpClient client;
         public static string serverIP;
         public Login()

@@ -5,12 +5,15 @@ using Ozeki.Media;
 using Ozeki.VoIP;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace WieloosobowyKomunikatorGlosowy
 {
     public class Klient
     {
         public string name;
+
+        static MP3StreamPlayback mp3Player;
 
         //OZEKI
         public ISoftPhone softphone;   // softphone object
@@ -35,6 +38,7 @@ namespace WieloosobowyKomunikatorGlosowy
             this.name = name;
            local_ip = GetLocalIPAddress();
            phoneLineList = new List<IPhoneLine>();
+            mp3Player = new MP3StreamPlayback("pew.mp3");
             OzekiInitialization();
 
         }
@@ -112,9 +116,23 @@ namespace WieloosobowyKomunikatorGlosowy
               
             }
             if (e.State == CallState.Answered)
+            {
+                SetupMp3Player();
                 SetupDevices();
+            }
+               
             if (e.State.IsCallEnded())
                 CloseDevices();
+        }
+        void SetupMp3Player()
+        {
+            connector.Connect(mp3Player, mediaSender);
+            mediaSender.AttachToCall(call);
+
+            mp3Player.Start();
+            //Thread.Sleep(3);
+
+            Console.WriteLine("The mp3 player is streaming.");
         }
         int x = 0;
         public void SetupDevices()
@@ -124,17 +142,21 @@ namespace WieloosobowyKomunikatorGlosowy
             {
                 OzekiInitialization();
             }
-            Console.WriteLine("setupDevices");
+            Console.WriteLine("setupDevices1");
 
             x++;
             microphone.Start();
             connector.Connect(microphone, mediaSender);
+            Console.WriteLine("setupDevices2");
 
             speaker.Start();
             connector.Connect(mediaReceiver, speaker);
+            Console.WriteLine("setupDevices3");
 
             mediaSender.AttachToCall(call);
+            Console.WriteLine("setupDevices4");
             mediaReceiver.AttachToCall(call);
+            Console.WriteLine("setupDevices5");
         }
         public void CloseDevices()
         {
@@ -145,8 +167,11 @@ namespace WieloosobowyKomunikatorGlosowy
             mediaReceiver.Detach();
             mediaSender.Detach();
             connector.Dispose();
+           
+            mp3Player.Stop();
+            mp3Player.Dispose();
 
-            
+
         }
 
         public string GetLocalIPAddress()

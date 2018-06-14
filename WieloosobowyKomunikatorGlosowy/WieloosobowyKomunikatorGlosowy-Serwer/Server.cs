@@ -51,8 +51,8 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
             //TCP
             setupTCPServer();
-            this.database = new Database();       
-            
+            this.database = new Database();
+            Console.WriteLine("ip:" + local_ip);
 
         }
         private void setupTCPServer()
@@ -128,6 +128,8 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             {
                 whichChannel = Int32.Parse(substrings[2]);
                 temp_name = substrings[0];
+                
+                buildChannelMessageInfo();
                 e.Reply("BYE");
             }
             else if (substrings[0] == "REG")
@@ -219,9 +221,9 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
         private void button2_Click(object sender, EventArgs e)
         {
-
+            //string z = GetLocalIPAddress();
             //System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.1.15");
-            System.Net.IPAddress ip = System.Net.IPAddress.Parse("192.168.0.106");
+            System.Net.IPAddress ip = System.Net.IPAddress.Parse(local_ip);
             server.Start(ip, 8910);
             Console.WriteLine("server started");
         }

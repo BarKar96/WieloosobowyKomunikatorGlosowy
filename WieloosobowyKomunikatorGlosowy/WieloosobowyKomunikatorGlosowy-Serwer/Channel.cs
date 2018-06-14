@@ -41,5 +41,18 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }
             
         }
+        public void remUser1(string name)
+        {
+
+            foreach (User u in userList)
+            {
+                if (u.name.Equals(name))
+                {
+                    userList.Remove(u);
+                    break;
+                }
+            }
+
+        }
     }
 }
