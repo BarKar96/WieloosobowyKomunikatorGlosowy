@@ -19,10 +19,11 @@ namespace WieloosobowyKomunikatorGlosowy
             this.name = name;
             this.number_user = number_user;
             this.description = description;
-            this.password = password;           
+            this.password = password;
             this.userList = new List<User>();
 
 
         }
+
     }
 }

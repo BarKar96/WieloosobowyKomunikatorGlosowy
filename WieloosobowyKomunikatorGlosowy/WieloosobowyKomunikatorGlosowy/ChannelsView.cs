@@ -24,6 +24,9 @@ namespace WieloosobowyKomunikatorGlosowy
         private int currentChannel = 0;
         //tcp
         private SimpleTcpClient client;
+        string callID = null;
+
+        int alreadyOnChannelCounter = 0;
         public ChannelsView(string serverIP, string login)
         {
             
@@ -63,6 +66,7 @@ namespace WieloosobowyKomunikatorGlosowy
             Console.WriteLine("serwer odpowiedzial: " + e.MessageString);
             if (e.MessageString == "PASSOK")
             {
+               
                 k.StartCall(serverIP);
             }
             if (e.MessageString == "PASSNOK")
@@ -71,28 +75,42 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             if (e.MessageString == "BYE")
             {
+                label5.Text = "";
+                label2.Text = "";
+                lb_UserList.Items.Clear();
                 k.HangUp();
+                alreadyOnChannelCounter = 0;
+                currentChannel = 0;
             }
             if (substrings[0] == "CHI")
             {
                 if (currentChannel == Int32.Parse(substrings[1]))
                 {
-                    if (Int32.Parse(substrings[3]) > Int32.Parse(label5.Text))
+                    Console.WriteLine("bylo: " + alreadyOnChannelCounter);
+                    if (Int32.Parse(substrings[3]) > alreadyOnChannelCounter)
                     {
                         ring2.Play();
+                       
                     }
                     else
                     {
                         ring3.Play();
                     }
+                    alreadyOnChannelCounter = Int32.Parse(substrings[3]);
+                    Console.WriteLine("jest: " + alreadyOnChannelCounter);
                     label2.Text = substrings[2];
-                    label5.Text = substrings[3];
-
+                    label5.Text = substrings[4];
                     lb_UserList.Items.Clear();
-                    for (int i = 5; i < substrings.Length; i++)
+                    if (substrings.Length>=5)
                     {
-                        lb_UserList.Items.Add(substrings[i]);
+                        for (int i = 5; i < substrings.Length; i++)
+                        {
+                            lb_UserList.Items.Add(substrings[i]);
+                        }
                     }
+                    
+
+
                     refreshGridView();
 
                 }
@@ -191,10 +209,11 @@ namespace WieloosobowyKomunikatorGlosowy
 
         private void btn_endCall_Click(object sender, EventArgs e)
         {
-            label2.Text = "";
-            label5.Text = "";
+            //ring3.Play();
+           
             lb_UserList.Items.Clear();
-            client.WriteLine(k.name+";BYE;"+ currentChannel);
+            client.WriteLine(k.name+";BYE;"+ currentChannel + ";" + k.call.CallID);
+           // currentChannel = 0;
         }
     }
 }

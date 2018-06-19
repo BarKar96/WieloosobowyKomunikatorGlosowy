@@ -35,6 +35,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             {
                 if (u.callID.Equals(callID))
                 {
+                    Console.WriteLine("tutaj4");
                     userList.Remove(u);
                     break;
                 }
@@ -53,7 +54,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                     break;
                 }
             }
-
+        }
 
         public string GetName()
         {

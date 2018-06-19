@@ -32,6 +32,7 @@ namespace WieloosobowyKomunikatorGlosowy
         public string local_ip;
         public string server_ip;
 
+        public string callID = null;
 
         public Klient(string name)
         {
@@ -94,7 +95,8 @@ namespace WieloosobowyKomunikatorGlosowy
                 call.CallStateChanged += call_CallStateChanged;
                 call.Start();
                 Console.WriteLine(call.CallID);
-                
+
+              
             }
         }
         public void softphone_IncomingCall(object sender, VoIPEventArgs<IPhoneCall> e)
@@ -117,7 +119,7 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             if (e.State == CallState.Answered)
             {
-                SetupMp3Player();
+                //SetupMp3Player();
                 SetupDevices();
             }
                

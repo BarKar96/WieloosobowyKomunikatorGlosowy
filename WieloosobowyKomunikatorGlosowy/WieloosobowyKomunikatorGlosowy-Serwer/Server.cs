@@ -127,10 +127,16 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }               
             else if (substrings[1] == "BYE")
             {
+               
+                Console.WriteLine("tutaj1");
                 whichChannel = Int32.Parse(substrings[2]);
                 temp_name = substrings[0];
-                
+                Console.WriteLine(substrings[3]);
+                Console.WriteLine("tutaj1.5");
+                channelList[whichChannel].remUser(substrings[3]);
                 buildChannelMessageInfo();
+                Console.WriteLine("tutaj2");
+                
                 e.Reply("BYE");
             }
             else if (substrings[0] == "REG")
@@ -188,6 +194,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
 
         void call_CallStateChanged(object sender, CallStateChangedArgs e)
         {
+
             call = sender as IPhoneCall;
             if (e.State == CallState.Answered)
             {
@@ -200,7 +207,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             else if (e.State.IsCallEnded())
             {
                 channelList[whichChannel].conferenceRoom.RemoveFromConference(call);
-                channelList[whichChannel].remUser(call.CallID);
+                //channelList[whichChannel].remUser(call.CallID);
                 Console.WriteLine(temp_name + " removed from channel: " + whichChannel);
             }
 
