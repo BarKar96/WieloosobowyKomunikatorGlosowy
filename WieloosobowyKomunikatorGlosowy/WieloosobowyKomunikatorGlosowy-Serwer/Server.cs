@@ -113,6 +113,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             if (substrings[0] == "HI")
             {
                 e.Reply(sendChannelInfo());
+                
 
             }
             else if(substrings[1] == "CH")

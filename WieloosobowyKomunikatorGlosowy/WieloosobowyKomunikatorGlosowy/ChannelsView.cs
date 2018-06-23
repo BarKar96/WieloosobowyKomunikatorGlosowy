@@ -98,20 +98,45 @@ namespace WieloosobowyKomunikatorGlosowy
                     }
                     alreadyOnChannelCounter = Int32.Parse(substrings[3]);
                     Console.WriteLine("jest: " + alreadyOnChannelCounter);
-                    label2.Text = substrings[2];
-                    label5.Text = substrings[4];
-                    lb_UserList.Items.Clear();
-                    if (substrings.Length>=5)
+                    if (InvokeRequired)
                     {
-                        for (int i = 5; i < substrings.Length; i++)
+                        Invoke(new Action(() =>
                         {
-                            lb_UserList.Items.Add(substrings[i]);
+                            label2.Text = substrings[2];
+                            label5.Text = substrings[4];
+                            lb_UserList.Items.Clear();
+                            if (substrings.Length >= 5)
+                            {
+                                for (int i = 5; i < substrings.Length; i++)
+                                {
+                                    lb_UserList.Items.Add(substrings[i]);
+                                }
+                            }
+
+
+
+                            refreshGridView();
+                        }));
+                    }
+                    else
+                    {
+                        label2.Text = substrings[2];
+                        label5.Text = substrings[4];
+                        lb_UserList.Items.Clear();
+                        if (substrings.Length >= 5)
+                        {
+                            for (int i = 5; i < substrings.Length; i++)
+                            {
+                                lb_UserList.Items.Add(substrings[i]);
+                            }
                         }
+
+
+
+                        refreshGridView();
                     }
                     
-
-
-                    refreshGridView();
+                    
 
                 }
             }
@@ -173,9 +198,9 @@ namespace WieloosobowyKomunikatorGlosowy
         }
         private void refreshGridView()
         {
-            dataGridView1.DataSource = null;
             if (InvokeRequired)
             {
+                dataGridView1.DataSource = null;
                 Invoke(new Action(() =>
                 {
                     dataGridView1.Rows.Clear();
@@ -187,6 +212,7 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             else
             {
+                dataGridView1.DataSource = null;
                 dataGridView1.Rows.Clear();
                 foreach (Channel ch in channelList)
                 {

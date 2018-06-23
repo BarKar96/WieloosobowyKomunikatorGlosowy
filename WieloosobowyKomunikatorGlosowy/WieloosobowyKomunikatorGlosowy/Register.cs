@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace WieloosobowyKomunikatorGlosowy
 {
@@ -62,6 +63,14 @@ namespace WieloosobowyKomunikatorGlosowy
             log.Show();
         }
 
+        public static bool CheckStrength(string password)
+        {
+            bool check = false;
+            if (Regex.Match(password, @"(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}", RegexOptions.ECMAScript).Success)
+                check = true;
+            return check;
+        }
+
         private void RegisterButton_Click(object sender, EventArgs e)
         {
             string login = text_user.Text;
@@ -74,6 +83,14 @@ namespace WieloosobowyKomunikatorGlosowy
             else if (password != password2)
             {
                 MessageBox.Show("Hasła się nie zgadzają!");
+            }
+            else if (CheckStrength(password)==false)
+            {
+                MessageBox.Show("Hasło za słabe. Musi składać się z 8 znaków oraz zawierać wielką literę i znak specjalny.");
+            }
+            else if (login.Length < 5)
+            {
+                MessageBox.Show("Login musi składać się z przynajmniej 5 znaków");
             }
             else
             {
