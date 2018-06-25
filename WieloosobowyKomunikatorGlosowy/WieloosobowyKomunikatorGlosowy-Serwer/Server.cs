@@ -275,7 +275,10 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                     name_box.Clear();
                     description_box.Clear();
                     password_box.Clear();
+
+                    server.Broadcast(sendChannelInfo());
                 }
+               
             }
         }
 

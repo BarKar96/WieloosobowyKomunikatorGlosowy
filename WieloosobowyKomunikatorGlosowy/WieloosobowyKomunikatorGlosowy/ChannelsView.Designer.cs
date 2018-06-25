@@ -37,7 +37,6 @@
             this.Haslo = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.mute_button = new System.Windows.Forms.Button();
             this.join_button = new System.Windows.Forms.Button();
-            this.refresh_button = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.btn_endCall = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -142,33 +141,23 @@
             this.join_button.UseVisualStyleBackColor = true;
             this.join_button.Click += new System.EventHandler(this.join_button_Click);
             // 
-            // refresh_button
-            // 
-            this.refresh_button.Location = new System.Drawing.Point(384, 329);
-            this.refresh_button.Name = "refresh_button";
-            this.refresh_button.Size = new System.Drawing.Size(75, 23);
-            this.refresh_button.TabIndex = 4;
-            this.refresh_button.Text = "refresh";
-            this.refresh_button.UseVisualStyleBackColor = true;
-            this.refresh_button.Click += new System.EventHandler(this.refresh_button_Click);
-            // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(585, 329);
+            this.button2.Location = new System.Drawing.Point(549, 412);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(86, 37);
             this.button2.TabIndex = 6;
-            this.button2.Text = "exit";
+            this.button2.Text = "Wyjdź z aplikacji";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // btn_endCall
             // 
-            this.btn_endCall.Location = new System.Drawing.Point(384, 377);
+            this.btn_endCall.Location = new System.Drawing.Point(12, 412);
             this.btn_endCall.Name = "btn_endCall";
-            this.btn_endCall.Size = new System.Drawing.Size(75, 23);
+            this.btn_endCall.Size = new System.Drawing.Size(75, 37);
             this.btn_endCall.TabIndex = 7;
-            this.btn_endCall.Text = "zakończ";
+            this.btn_endCall.Text = "Wyjdź z kanału";
             this.btn_endCall.UseVisualStyleBackColor = true;
             this.btn_endCall.Click += new System.EventHandler(this.btn_endCall_Click);
             // 
@@ -227,7 +216,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(953, 459);
+            this.ClientSize = new System.Drawing.Size(647, 459);
             this.ControlBox = false;
             this.Controls.Add(this.label5);
             this.Controls.Add(this.lb_UserList);
@@ -237,7 +226,6 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btn_endCall);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.refresh_button);
             this.Controls.Add(this.join_button);
             this.Controls.Add(this.mute_button);
             this.Controls.Add(this.groupBox1);
@@ -262,7 +250,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Liczba_osob;
         private System.Windows.Forms.DataGridViewTextBoxColumn Opis;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Haslo;
-        private System.Windows.Forms.Button refresh_button;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button btn_endCall;
         private System.Windows.Forms.Label label1;

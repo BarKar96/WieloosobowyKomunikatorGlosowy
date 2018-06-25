@@ -54,7 +54,7 @@ namespace WieloosobowyKomunikatorGlosowy
 
             label5.Text = "0";
 
-
+            btn_endCall.Visible = false;
 
         }
 
@@ -66,7 +66,19 @@ namespace WieloosobowyKomunikatorGlosowy
             Console.WriteLine("serwer odpowiedzial: " + e.MessageString);
             if (e.MessageString == "PASSOK")
             {
-               
+                if (InvokeRequired)
+                {
+                    
+                    Invoke(new Action(() =>
+                    {
+                        
+                       
+                            join_button.Visible = false;
+                            btn_endCall.Visible = true;
+                        
+                    }));
+                }
+                
                 k.StartCall(serverIP);
             }
             if (e.MessageString == "PASSNOK")
@@ -81,6 +93,9 @@ namespace WieloosobowyKomunikatorGlosowy
                 k.HangUp();
                 alreadyOnChannelCounter = 0;
                 currentChannel = 0;
+                join_button.Visible = true;
+                btn_endCall.Visible = false;
+
             }
             if (substrings[0] == "CHI")
             {
@@ -135,13 +150,24 @@ namespace WieloosobowyKomunikatorGlosowy
 
                         refreshGridView();
                     }
-                    
-                    
+
+                    if (substrings.Length >= 5)
+                    {
+                        int counter = 0;
+                        for (int i = 5; i < substrings.Length; i++)
+                        {
+                            counter++;
+
+                        }
+                        dataGridView1[1, Int32.Parse(substrings[1])].Value = counter;
+                    }
+
 
                 }
             }
             if (substrings[0] == "CHB")
             {
+                channelList.Clear();
                 Char de = '|';
                 String[] strings = e.MessageString.Split(de);
                 de = ';';
@@ -198,12 +224,14 @@ namespace WieloosobowyKomunikatorGlosowy
         }
         private void refreshGridView()
         {
+            
             if (InvokeRequired)
             {
                 dataGridView1.DataSource = null;
                 Invoke(new Action(() =>
                 {
                     dataGridView1.Rows.Clear();
+                    
                     foreach (Channel ch in channelList)
                     {
                         dataGridView1.Rows.Add(ch.name, ch.number_user, ch.description, ch.password);
@@ -229,8 +257,19 @@ namespace WieloosobowyKomunikatorGlosowy
 
         private void button2_Click(object sender, EventArgs e)
         {
-            k.HangUp();
-            Application.Exit();
+            if (k.call == null)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                client.WriteLine(k.name + ";BYE;" + currentChannel + ";" + k.call.CallID);
+                k.HangUp();
+                Application.Exit();
+            }
+            
+           
+            
         }
 
         private void btn_endCall_Click(object sender, EventArgs e)
