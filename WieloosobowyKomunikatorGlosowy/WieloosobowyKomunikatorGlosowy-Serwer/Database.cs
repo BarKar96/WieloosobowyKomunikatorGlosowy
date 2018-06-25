@@ -146,5 +146,11 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             command.Parameters.AddWithValue("$login", login);
             command.ExecuteNonQuery();
         }
+        public void RemoveChannel(string channelName)
+        {
+            command = new SQLiteCommand("delete from channels where channel_name =$channelName", m_dbconnection);
+            command.Parameters.AddWithValue("$channelName", channelName);
+            command.ExecuteNonQuery();
+        }
     }
 }

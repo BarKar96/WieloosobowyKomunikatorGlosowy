@@ -50,9 +50,10 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }
             //TCP
             setupTCPServer();
-
+            Console.WriteLine(local_ip);
+            server.Start(System.Net.IPAddress.Parse(local_ip), 8910);
+            Console.WriteLine("server started");
             this.database = new Database();
-            Console.WriteLine("ip:" + local_ip);
 
 
         }
@@ -226,17 +227,6 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             }
             throw new Exception("Local IP Address Not Found!");
         }
-        
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-            System.Net.IPAddress ip = System.Net.IPAddress.Parse(GetLocalIPAddress());
-            Console.WriteLine(GetLocalIPAddress());
-
-            server.Start(ip, 8910);
-            Console.WriteLine("server started");
-        }
 
 
         private string ChangeToSHA2_256(string input)
@@ -281,6 +271,29 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                
             }
         }
+        private void deleteButton_Click(object sender, EventArgs e)
+        {
+            string roomName = listBox1.SelectedItem.ToString();
+            foreach (Channel channel in channelList)
+            {
+                if (roomName.Equals(channel.GetName()))
+                {
+                    if (channel.userList.Count == 0)
+                    {
+                        listBox1.Items.Remove(channel.GetName());
+                        channelList.Remove(channel);
+                        server.Broadcast(sendChannelInfo());
+                        database.RemoveChannel(channel.GetName());
+                        MessageBox.Show("Usunięto kanał " + channel.GetName());
+                        break;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Nie można usunąć kanału z aktywnymi użytkownikami");
+                    }
+                }
+            }
+        }
 
 
         [STAThread]
@@ -290,6 +303,8 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Server());
         }
+
+
     }
 }
 

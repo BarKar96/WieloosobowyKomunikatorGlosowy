@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.button2 = new System.Windows.Forms.Button();
             this.description = new System.Windows.Forms.Label();
             this.description_box = new System.Windows.Forms.TextBox();
             this.name_box = new System.Windows.Forms.TextBox();
@@ -37,6 +36,7 @@
             this.password = new System.Windows.Forms.Label();
             this.password_box = new System.Windows.Forms.TextBox();
             this.add_channel = new System.Windows.Forms.Button();
+            this.deleteButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listBox1
@@ -46,16 +46,6 @@
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(194, 160);
             this.listBox1.TabIndex = 0;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(37, 207);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "serverstart";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // description
             // 
@@ -104,13 +94,13 @@
             this.password_box.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.password_box.Location = new System.Drawing.Point(366, 106);
             this.password_box.Name = "password_box";
+            this.password_box.PasswordChar = '*';
             this.password_box.Size = new System.Drawing.Size(152, 20);
             this.password_box.TabIndex = 10;
-            this.password_box.PasswordChar = '*';
             // 
             // add_channel
             // 
-            this.add_channel.Location = new System.Drawing.Point(261, 207);
+            this.add_channel.Location = new System.Drawing.Point(443, 162);
             this.add_channel.Name = "add_channel";
             this.add_channel.Size = new System.Drawing.Size(75, 23);
             this.add_channel.TabIndex = 12;
@@ -118,11 +108,22 @@
             this.add_channel.UseVisualStyleBackColor = true;
             this.add_channel.Click += new System.EventHandler(this.add_channel_Click);
             // 
+            // deleteButton
+            // 
+            this.deleteButton.Location = new System.Drawing.Point(260, 162);
+            this.deleteButton.Name = "deleteButton";
+            this.deleteButton.Size = new System.Drawing.Size(75, 23);
+            this.deleteButton.TabIndex = 13;
+            this.deleteButton.Text = "Usuń kanał";
+            this.deleteButton.UseVisualStyleBackColor = true;
+            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(675, 367);
+            this.ClientSize = new System.Drawing.Size(559, 223);
+            this.Controls.Add(this.deleteButton);
             this.Controls.Add(this.add_channel);
             this.Controls.Add(this.password);
             this.Controls.Add(this.password_box);
@@ -130,10 +131,9 @@
             this.Controls.Add(this.description_box);
             this.Controls.Add(this.name_box);
             this.Controls.Add(this.channel_name);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.listBox1);
             this.Name = "Server";
-            this.Text = "Form1";
+            this.Text = "Wieloosobowy komunikator głosowy - serwer";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -142,7 +142,6 @@
         #endregion
 
         private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label description;
         private System.Windows.Forms.TextBox description_box;
         private System.Windows.Forms.TextBox name_box;
@@ -150,6 +149,7 @@
         private System.Windows.Forms.Label password;
         private System.Windows.Forms.TextBox password_box;
         private System.Windows.Forms.Button add_channel;
+        private System.Windows.Forms.Button deleteButton;
     }
 }
 
