@@ -138,7 +138,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                 channelList[whichChannel].remUser(substrings[3]);
                 buildChannelMessageInfo();
                 Console.WriteLine("tutaj2");
-                
+                database.RemoveUserFromChannel(substrings[3]);
                 e.Reply("BYE");
             }
             else if (substrings[0] == "REG")
@@ -204,6 +204,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                 channelList[whichChannel].addUser(new User(temp_name, call.CallID));
                 Console.WriteLine(temp_name + " added to channel: " + whichChannel);
                 buildChannelMessageInfo();
+                database.AddUserToChannel(temp_name, channelList[whichChannel].GetName());
                 
             }
             else if (e.State.IsCallEnded())
@@ -265,7 +266,6 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                     name_box.Clear();
                     description_box.Clear();
                     password_box.Clear();
-
                     server.Broadcast(sendChannelInfo());
                 }
                

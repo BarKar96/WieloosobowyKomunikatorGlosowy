@@ -130,6 +130,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         public void AddUserToChannel(string login, string channel_name)
         {
             command = new SQLiteCommand("select channel_id from channels where channel_name=$channel_name", m_dbconnection);
+            command.Parameters.AddWithValue("$channel_name", channel_name);
             reader = command.ExecuteReader();
             if (reader.Read())
             {
