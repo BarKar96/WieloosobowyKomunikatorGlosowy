@@ -15,6 +15,7 @@ namespace WieloosobowyKomunikatorGlosowy
     public partial class Register : Form
     {
         private SimpleTcpClient client;
+        public static DiffieHellman diffieHellman;
         public static string serverIP;
         public Register()
         {
@@ -95,7 +96,7 @@ namespace WieloosobowyKomunikatorGlosowy
             else
             {
                 password = SHA.ChangeToSHA2_256(password);
-                client.WriteLine("REG;" + login + ";" + password);
+                client.WriteLine(diffieHellman.EncryptMessage("REG;" + login + ";" + password));
             }
         }
     }

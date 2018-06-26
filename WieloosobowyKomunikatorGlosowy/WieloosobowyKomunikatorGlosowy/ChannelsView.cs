@@ -17,6 +17,7 @@ namespace WieloosobowyKomunikatorGlosowy
         private static System.Media.SoundPlayer ring { get; set; }
         private static System.Media.SoundPlayer ring2 { get; set; }
         private static System.Media.SoundPlayer ring3 { get; set; }
+        public static DiffieHellman diffieHellman;
         //ozeki
         private List<Channel> channelList;
         private Klient k;
@@ -50,12 +51,9 @@ namespace WieloosobowyKomunikatorGlosowy
             client.StringEncoder = Encoding.UTF8;
             client.Connect(serverIP, 8910);
             client.DataReceived += Client_DataReceived;
-            client.WriteLine("HI;");
-
+            client.WriteLine(diffieHellman.EncryptMessage("HI;"));
             label5.Text = "0";
-
             btn_endCall.Visible = false;
-
         }
 
         private void Client_DataReceived(object sender, SimpleTCP.Message e)
@@ -70,13 +68,16 @@ namespace WieloosobowyKomunikatorGlosowy
                 {
                     
                     Invoke(new Action(() =>
-                    {
-                        
-                       
-                            join_button.Visible = false;
-                            btn_endCall.Visible = true;
+                    {               
+                        join_button.Visible = false;
+                        btn_endCall.Visible = true;
                         
                     }));
+                }
+                else
+                {
+                    join_button.Visible = false;
+                    btn_endCall.Visible = true;
                 }
                 
                 k.StartCall(serverIP);
@@ -87,14 +88,31 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             if (e.MessageString == "BYE")
             {
-                label5.Text = "";
-                label2.Text = "";
-                lb_UserList.Items.Clear();
-                k.HangUp();
-                alreadyOnChannelCounter = 0;
-                currentChannel = 0;
-                join_button.Visible = true;
-                btn_endCall.Visible = false;
+                if (InvokeRequired)
+                {
+                    Invoke(new Action(() =>
+                    {
+                        label5.Text = "";
+                        label2.Text = "";
+                        lb_UserList.Items.Clear();
+                        k.HangUp();
+                        alreadyOnChannelCounter = 0;
+                        currentChannel = 0;
+                        join_button.Visible = true;
+                        btn_endCall.Visible = false;
+                    }));
+                }
+                else
+                {
+                    label5.Text = "";
+                    label2.Text = "";
+                    lb_UserList.Items.Clear();
+                    k.HangUp();
+                    alreadyOnChannelCounter = 0;
+                    currentChannel = 0;
+                    join_button.Visible = true;
+                    btn_endCall.Visible = false;
+                }
 
             }
             if (substrings[0] == "CHI")
@@ -104,8 +122,7 @@ namespace WieloosobowyKomunikatorGlosowy
                     Console.WriteLine("bylo: " + alreadyOnChannelCounter);
                     if (Int32.Parse(substrings[3]) > alreadyOnChannelCounter)
                     {
-                        ring2.Play();
-                       
+                        ring2.Play();                       
                     }
                     else
                     {
@@ -127,9 +144,6 @@ namespace WieloosobowyKomunikatorGlosowy
                                     lb_UserList.Items.Add(substrings[i]);
                                 }
                             }
-
-
-
                             refreshGridView();
                         }));
                     }
@@ -145,9 +159,6 @@ namespace WieloosobowyKomunikatorGlosowy
                                 lb_UserList.Items.Add(substrings[i]);
                             }
                         }
-
-
-
                         refreshGridView();
                     }
 
@@ -161,8 +172,6 @@ namespace WieloosobowyKomunikatorGlosowy
                         }
                         dataGridView1[1, Int32.Parse(substrings[1])].Value = counter;
                     }
-
-
                 }
             }
             if (substrings[0] == "CHB")
@@ -182,8 +191,11 @@ namespace WieloosobowyKomunikatorGlosowy
                     Console.WriteLine("add " + temp[0]);
                 }
                 refreshGridView();
-
-
+            }
+            if (substrings[0] == "EXIT")
+            {
+                MessageBox.Show("Serwer został wyłączony");
+                Application.Exit();
             }
         }
         private void join_button_Click(object sender, EventArgs e)
@@ -196,7 +208,7 @@ namespace WieloosobowyKomunikatorGlosowy
             {
                 password = Prompt.ShowDialog("Hasło wymagane", "Podaj hasło");
             }
-            client.WriteLine(k.name + ";CH;" + dataGridView1.CurrentCell.RowIndex + ";" + SHA.ChangeToSHA2_256(password) + ";"); 
+            client.WriteLine(diffieHellman.EncryptMessage(k.name + ";CH;" + dataGridView1.CurrentCell.RowIndex + ";" + SHA.ChangeToSHA2_256(password))); 
         }
         public bool mute = false;
         private void mute_button_Click(object sender, EventArgs e)
@@ -217,10 +229,20 @@ namespace WieloosobowyKomunikatorGlosowy
 
         private void logout_button_Click(object sender, EventArgs e)
         {
+            if (k.call != null)
+            {
+                client.WriteLine(diffieHellman.EncryptMessage(k.name + ";BYE;" + currentChannel + ";" + k.call.CallID));
+                k.HangUp();
+            }
+            //client.WriteLine(diffieHellman.EncryptMessage("EXIT;"));
             this.Hide();
             client.DataReceived -= Client_DataReceived;
             Login log = new Login();
             log.Show();
+            //Server_IP server_IP = new Server_IP();
+            //server_IP.Show();
+
+
         }
         private void refreshGridView()
         {
@@ -257,13 +279,15 @@ namespace WieloosobowyKomunikatorGlosowy
 
         private void button2_Click(object sender, EventArgs e)
         {
+
+            client.WriteLine(diffieHellman.EncryptMessage("EXIT;"));
             if (k.call == null)
             {
                 Application.Exit();
             }
             else
             {
-                client.WriteLine(k.name + ";BYE;" + currentChannel + ";" + k.call.CallID);
+                client.WriteLine(diffieHellman.EncryptMessage(k.name + ";BYE;" + currentChannel + ";" + k.call.CallID));
                 k.HangUp();
                 Application.Exit();
             }
@@ -277,7 +301,7 @@ namespace WieloosobowyKomunikatorGlosowy
             //ring3.Play();
            
             lb_UserList.Items.Clear();
-            client.WriteLine(k.name+";BYE;"+ currentChannel + ";" + k.call.CallID);
+            client.WriteLine(diffieHellman.EncryptMessage(k.name+";BYE;"+ currentChannel + ";" + k.call.CallID));
            // currentChannel = 0;
         }
     }

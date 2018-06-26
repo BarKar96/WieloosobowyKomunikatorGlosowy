@@ -17,6 +17,7 @@ namespace WieloosobowyKomunikatorGlosowy
         SimpleTcpClient client;
         public static string serverIP;
         public string login_name;
+        public static DiffieHellman diffieHellman;
         public Login()
         {
             InitializeComponent();
@@ -35,6 +36,7 @@ namespace WieloosobowyKomunikatorGlosowy
             if (e.MessageString == "LOGOK")
             {
                 client.DataReceived -= Client_DataReceived;
+                ChannelsView.diffieHellman = diffieHellman;
                 ChannelsView frm = new ChannelsView(serverIP, login_name);
                 if (InvokeRequired)
                 {
@@ -59,7 +61,10 @@ namespace WieloosobowyKomunikatorGlosowy
 
         private void exit_Click(object sender, EventArgs e)
         {
-            Environment.Exit(0);
+            client.WriteLine(diffieHellman.EncryptMessage("EXIT;"));
+            Server_IP ser = new Server_IP();
+            Hide();
+            ser.Show();
         }
 
         private void log_Click(object sender, EventArgs e)
@@ -72,7 +77,7 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             else
             {
-                client.WriteLine("LOG;" + login + ";" + password);
+                client.Write(diffieHellman.EncryptMessage("LOG;" + login + ";" + password));
                 login_name = login;
             }
         }
@@ -82,6 +87,7 @@ namespace WieloosobowyKomunikatorGlosowy
             client.DataReceived -= Client_DataReceived;
             this.Hide();
             Register.serverIP = serverIP;
+            Register.diffieHellman = diffieHellman;
             Register reg = new Register();
             reg.ShowDialog();
         }

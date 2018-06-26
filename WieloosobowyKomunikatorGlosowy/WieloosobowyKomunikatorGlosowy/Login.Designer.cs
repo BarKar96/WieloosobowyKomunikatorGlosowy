@@ -54,7 +54,7 @@ namespace WieloosobowyKomunikatorGlosowy
             this.exit.Name = "exit";
             this.exit.Size = new System.Drawing.Size(75, 23);
             this.exit.TabIndex = 1;
-            this.exit.Text = "Wyjdź";
+            this.exit.Text = "Powrót";
             this.exit.UseVisualStyleBackColor = true;
             this.exit.Click += new System.EventHandler(this.exit_Click);
             // 
@@ -117,6 +117,7 @@ namespace WieloosobowyKomunikatorGlosowy
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
+            this.ControlBox = false;
             this.Controls.Add(this.register);
             this.Controls.Add(this.label_register);
             this.Controls.Add(this.password);

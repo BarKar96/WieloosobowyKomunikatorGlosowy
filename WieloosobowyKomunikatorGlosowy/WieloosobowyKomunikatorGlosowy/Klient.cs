@@ -151,7 +151,7 @@ namespace WieloosobowyKomunikatorGlosowy
             connector.Connect(microphone, mediaSender);
             Console.WriteLine("setupDevices2");
 
-            speaker.Start();
+            //speaker.Start();
             connector.Connect(mediaReceiver, speaker);
             Console.WriteLine("setupDevices3");
 
@@ -163,16 +163,17 @@ namespace WieloosobowyKomunikatorGlosowy
         public void CloseDevices()
         {
             Console.WriteLine("closeDevices");
+
             phoneLine.Dispose();
             microphone.Dispose();
-            speaker.Dispose();
+            //speaker.Dispose();
             mediaReceiver.Detach();
             mediaSender.Detach();
             connector.Dispose();
            
             mp3Player.Stop();
             mp3Player.Dispose();
-
+            
 
         }
 
@@ -192,18 +193,23 @@ namespace WieloosobowyKomunikatorGlosowy
         {         
             if (call != null)
             {
-                
+
                 call.HangUp();
                 call.PhoneLine.Dispose();
                 call.CallStateChanged += call_CallStateChanged;
-                call = null; 
+                call = null;
             }
             else
             {
                 Console.WriteLine("call = null");
             }
         }
-      
+        
+        public void ReleasePort()
+        {
+            
+        }
+
         [STAThread]
         public static void Main()
         {

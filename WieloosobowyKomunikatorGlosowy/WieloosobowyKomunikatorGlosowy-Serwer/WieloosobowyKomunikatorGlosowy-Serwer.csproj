@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channel.cs" />
-    <Compile Include="TCP_Connection.cs" />
+    <Compile Include="DiffieHellman.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Server.cs">
       <SubType>Form</SubType>

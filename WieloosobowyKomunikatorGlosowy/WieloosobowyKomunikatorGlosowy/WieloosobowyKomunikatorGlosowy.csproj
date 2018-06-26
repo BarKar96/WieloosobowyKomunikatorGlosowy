@@ -61,6 +61,7 @@
     <Compile Include="ChannelsView.Designer.cs">
       <DependentUpon>ChannelsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="DiffieHellman.cs" />
     <Compile Include="PromptDialog.cs" />
     <Compile Include="Register.cs">
       <SubType>Form</SubType>
@@ -83,7 +84,6 @@
       <DependentUpon>Server_IP.cs</DependentUpon>
     </Compile>
     <Compile Include="SHA.cs" />
-    <Compile Include="TCP_Connection.cs" />
     <Compile Include="User.cs" />
     <EmbeddedResource Include="ChannelsView.resx">
       <DependentUpon>ChannelsView.cs</DependentUpon>

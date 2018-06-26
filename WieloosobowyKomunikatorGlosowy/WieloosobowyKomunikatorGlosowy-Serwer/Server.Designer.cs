@@ -37,6 +37,7 @@
             this.password_box = new System.Windows.Forms.TextBox();
             this.add_channel = new System.Windows.Forms.Button();
             this.deleteButton = new System.Windows.Forms.Button();
+            this.exitButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listBox1
@@ -100,7 +101,7 @@
             // 
             // add_channel
             // 
-            this.add_channel.Location = new System.Drawing.Point(443, 162);
+            this.add_channel.Location = new System.Drawing.Point(366, 162);
             this.add_channel.Name = "add_channel";
             this.add_channel.Size = new System.Drawing.Size(75, 23);
             this.add_channel.TabIndex = 12;
@@ -118,11 +119,23 @@
             this.deleteButton.UseVisualStyleBackColor = true;
             this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
             // 
+            // exitButton
+            // 
+            this.exitButton.Location = new System.Drawing.Point(472, 162);
+            this.exitButton.Name = "exitButton";
+            this.exitButton.Size = new System.Drawing.Size(75, 23);
+            this.exitButton.TabIndex = 14;
+            this.exitButton.Text = "Wyłącz serwer";
+            this.exitButton.UseVisualStyleBackColor = true;
+            this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(559, 223);
+            this.ControlBox = false;
+            this.Controls.Add(this.exitButton);
             this.Controls.Add(this.deleteButton);
             this.Controls.Add(this.add_channel);
             this.Controls.Add(this.password);
@@ -150,6 +163,7 @@
         private System.Windows.Forms.TextBox password_box;
         private System.Windows.Forms.Button add_channel;
         private System.Windows.Forms.Button deleteButton;
+        private System.Windows.Forms.Button exitButton;
     }
 }
 

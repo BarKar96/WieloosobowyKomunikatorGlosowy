@@ -76,6 +76,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
+            this.ControlBox = false;
             this.Controls.Add(this.exit);
             this.Controls.Add(this.connect_button);
             this.Controls.Add(this.server_ip_text);

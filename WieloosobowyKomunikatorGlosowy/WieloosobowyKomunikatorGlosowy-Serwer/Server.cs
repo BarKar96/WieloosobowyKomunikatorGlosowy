@@ -23,6 +23,7 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         public string local_ip;
 
         private List<Channel> channelList;
+        private List<DiffieHellman> clientList = new List<DiffieHellman>();
 
 
         string temp_name = null;
@@ -107,59 +108,75 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
         }
         private void Server_DataReceived(object sender, SimpleTCP.Message e)
         {
-            string message = e.MessageString.Remove(e.MessageString.Length - 1);
+            string message = e.MessageString.Replace("\u0013", string.Empty);
             Char delimiter = ';';
             String[] substrings = message.Split(delimiter);
-            Console.WriteLine(message);
-            if (substrings[0] == "HI")
+            Console.WriteLine("Otrzymana wiadomość: " + message);
+            if (substrings[0] == "DHCK")
             {
-                e.Reply(sendChannelInfo());
-                
-
-            }
-            else if(substrings[1] == "CH")
-            {
-                whichChannel = Int32.Parse(substrings[2]);
-                temp_name = substrings[0];
-                if (channelList[whichChannel].password == substrings[3])
-                    e.Reply("PASSOK");
-                else
-                    e.Reply("PASSNOK");
-
-            }               
-            else if (substrings[1] == "BYE")
-            {
-               
-                Console.WriteLine("tutaj1");
-                whichChannel = Int32.Parse(substrings[2]);
-                temp_name = substrings[0];
-                Console.WriteLine(substrings[3]);
-                Console.WriteLine("tutaj1.5");
-                channelList[whichChannel].remUser(substrings[3]);
-                buildChannelMessageInfo();
-                Console.WriteLine("tutaj2");
-                database.RemoveUserFromChannel(substrings[3]);
-                e.Reply("BYE");
-            }
-            else if (substrings[0] == "REG")
-            {
-                bool answer = database.AddUser(substrings[1], substrings[2]);
-                if (answer == true)
-                    e.Reply("REGOK");
-                else
-                    e.Reply("REGNOK");
-            }
-            else if (substrings[0] == "LOG")
-            {
-                bool answer = database.CheckPassword(substrings[1], substrings[2]);
-                if (answer == true)
-                    e.Reply("LOGOK");
-                else
-                    e.Reply("LOGNOK");
+                DiffieHellman dh = new DiffieHellman();
+                dh.CreateDeriveKey(substrings[1]);
+                dh.ipAdress = ((IPEndPoint)e.TcpClient.Client.RemoteEndPoint).Address.ToString();
+                clientList.Add(dh);
+                e.Reply("DHSK;" + Encoding.ASCII.GetString(dh.iv) + ";" + Convert.ToBase64String(dh.serverPublicKey));
             }
             else
             {
-                Console.WriteLine("nieznany komunikat");
+                string encrypted_message = decryptByIP(e, message);
+                //message = encrypted_message.Remove(encrypted_message.Length - 1);
+                substrings = encrypted_message.Split(delimiter);
+                Console.WriteLine("Odszyfrowana wiadomość " + encrypted_message);
+                if (substrings[0] == "HI")
+                {
+                    e.Reply(sendChannelInfo());
+                }
+                else if (substrings[1] == "CH")
+                {
+                    whichChannel = Int32.Parse(substrings[2]);
+                    temp_name = substrings[0];
+                    if (channelList[whichChannel].password == substrings[3])
+                        e.Reply("PASSOK");
+                    else
+                        e.Reply("PASSNOK");
+
+                }
+                else if (substrings[1] == "BYE")
+                {
+                    Console.WriteLine("tutaj1");
+                    whichChannel = Int32.Parse(substrings[2]);
+                    temp_name = substrings[0];
+                    Console.WriteLine(substrings[3]);
+                    Console.WriteLine("tutaj1.5");
+                    channelList[whichChannel].remUser(substrings[3]);
+                    buildChannelMessageInfo();
+                    Console.WriteLine("tutaj2");
+                    database.RemoveUserFromChannel(substrings[3]);
+                    e.Reply("BYE");
+                }
+                else if (substrings[0] == "REG")
+                {
+                    bool answer = database.AddUser(substrings[1], substrings[2]);
+                    if (answer == true)
+                        e.Reply("REGOK");
+                    else
+                        e.Reply("REGNOK");
+                }
+                else if (substrings[0] == "LOG")
+                {
+                    bool answer = database.CheckPassword(substrings[1], substrings[2]);
+                    if (answer == true)
+                        e.Reply("LOGOK");
+                    else
+                        e.Reply("LOGNOK");
+                }
+                else if (substrings[0] == "EXIT")
+                {
+                    removeFromDHList(e);
+                }
+                else
+                {
+                    Console.WriteLine("nieznany komunikat");
+                }
             }
         }
 
@@ -294,6 +311,37 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                 }
             }
         }
+        public string decryptByIP(SimpleTCP.Message e, string message)
+        {
+            string decrypted_message = "";
+            string ip = ((IPEndPoint)e.TcpClient.Client.RemoteEndPoint).Address.ToString();
+            foreach (DiffieHellman dh in clientList)
+            {
+                if (dh.ipAdress.Equals(ip))
+                {
+                    decrypted_message = dh.DecryptMessage(Convert.FromBase64String(message));
+                    break;
+                }
+            }
+            return decrypted_message;
+        }
+
+        public void removeFromDHList(SimpleTCP.Message e)
+        {
+            string ip = ((IPEndPoint)e.TcpClient.Client.RemoteEndPoint).Address.ToString();
+            foreach (DiffieHellman dh in clientList)
+            {
+                if (dh.ipAdress.Equals(ip))
+                {
+                    clientList.Remove(dh);
+                    break;
+                }
+            }
+            foreach (DiffieHellman dh in clientList)
+            {
+                Console.WriteLine(dh.ipAdress);
+            }
+        }
 
 
         [STAThread]
@@ -304,7 +352,11 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             Application.Run(new Server());
         }
 
-
+        private void exitButton_Click(object sender, EventArgs e)
+        {
+            server.Broadcast("EXIT");
+            Application.Exit();
+        }
     }
 }
 
