@@ -28,32 +28,43 @@ namespace WieloosobowyKomunikatorGlosowy
 
         public void Client_DataReceived(object sender, SimpleTCP.Message e)
         {
-            Char delimiter = ';';
-            String[] substrings = e.MessageString.Split(delimiter);
-
-            Console.WriteLine("serwer odpowiedzial: " + e.MessageString);
-            if (e.MessageString == "REGOK")
+            string message = e.MessageString.Replace("\u0013", string.Empty);
+            if (message == "EXIT")
             {
-                MessageBox.Show("Rejestracja udana! Możesz się zalogować.");
-                Login log = new Login();
-                if (InvokeRequired)
+                MessageBox.Show("Serwer został wyłączony");
+                Application.Exit();
+            }
+            else
+            {
+                string decryptedMessage = diffieHellman.DecryptMessage(Convert.FromBase64String(message));
+                Char delimiter = ';';
+                String[] substrings = decryptedMessage.Split(delimiter);
+
+                Console.WriteLine("serwer odpowiedzial: " + message);
+                Console.WriteLine("Odszyfrowana wiadomość " + decryptedMessage);
+                if (substrings[0] == "REGOK")
                 {
-                    Invoke(new Action(() =>
+                    MessageBox.Show("Rejestracja udana! Możesz się zalogować.");
+                    Login log = new Login();
+                    if (InvokeRequired)
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            Hide();
+                            log.Show();
+                        }));
+                    }
+                    else
                     {
                         Hide();
                         log.Show();
-                    }));
-                }
-                else
-                {
-                    Hide();
-                    log.Show();
-                }
+                    }
 
-            }
-            else if (e.MessageString == "REGNOK")
-            {
-                MessageBox.Show("Rejestracja nieudana! Login zajęty");
+                }
+                else if (substrings[0] == "REGNOK")
+                {
+                    MessageBox.Show("Rejestracja nieudana! Login zajęty");
+                }
             }
         }
 

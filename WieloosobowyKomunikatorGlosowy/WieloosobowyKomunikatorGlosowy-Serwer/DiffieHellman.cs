@@ -45,6 +45,11 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                 using (MemoryStream ciphertext = new MemoryStream())
                 using (CryptoStream cs = new CryptoStream(ciphertext, aes.CreateEncryptor(), CryptoStreamMode.Write))
                 {
+                    int mod4 = message.Length % 4;
+                    if (mod4 > 0)
+                    {
+                        message += new string(';', 4 - mod4);
+                    }
                     byte[] plaintextMessage = Convert.FromBase64String(message.Replace(";", "/"));
                     cs.Write(plaintextMessage, 0, plaintextMessage.Length);
                     cs.Close();

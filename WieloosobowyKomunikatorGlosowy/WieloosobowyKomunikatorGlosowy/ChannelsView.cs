@@ -20,9 +20,10 @@ namespace WieloosobowyKomunikatorGlosowy
         public static DiffieHellman diffieHellman;
         //ozeki
         private List<Channel> channelList;
-        private Klient k;
+        private static Klient k = null;
         private string serverIP;
         private int currentChannel = 0;
+        private string login;
         //tcp
         private SimpleTcpClient client;
         string callID = null;
@@ -33,6 +34,7 @@ namespace WieloosobowyKomunikatorGlosowy
             
             InitializeComponent();
             this.serverIP = serverIP;
+            this.login = login;
             channelList = new List<Channel>();
 
             ring = new System.Media.SoundPlayer();
@@ -45,7 +47,10 @@ namespace WieloosobowyKomunikatorGlosowy
             ring3.SoundLocation = "neck.wav";
 
             //Ozeki
-            k = new Klient(login);
+            if (k == null)
+            {
+                k = new Klient();
+            }
             //TCP
             client = new SimpleTcpClient();
             client.StringEncoder = Encoding.UTF8;
@@ -60,61 +65,7 @@ namespace WieloosobowyKomunikatorGlosowy
         {
             Char delimiter = ';';
             String[] substrings = e.MessageString.Split(delimiter);
-
             Console.WriteLine("serwer odpowiedzial: " + e.MessageString);
-            if (e.MessageString == "PASSOK")
-            {
-                if (InvokeRequired)
-                {
-                    
-                    Invoke(new Action(() =>
-                    {               
-                        join_button.Visible = false;
-                        btn_endCall.Visible = true;
-                        
-                    }));
-                }
-                else
-                {
-                    join_button.Visible = false;
-                    btn_endCall.Visible = true;
-                }
-                
-                k.StartCall(serverIP);
-            }
-            if (e.MessageString == "PASSNOK")
-            {
-                MessageBox.Show("Hasło niepoprawne. Spróbuj ponownie.");
-            }
-            if (e.MessageString == "BYE")
-            {
-                if (InvokeRequired)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        label5.Text = "";
-                        label2.Text = "";
-                        lb_UserList.Items.Clear();
-                        k.HangUp();
-                        alreadyOnChannelCounter = 0;
-                        currentChannel = 0;
-                        join_button.Visible = true;
-                        btn_endCall.Visible = false;
-                    }));
-                }
-                else
-                {
-                    label5.Text = "";
-                    label2.Text = "";
-                    lb_UserList.Items.Clear();
-                    k.HangUp();
-                    alreadyOnChannelCounter = 0;
-                    currentChannel = 0;
-                    join_button.Visible = true;
-                    btn_endCall.Visible = false;
-                }
-
-            }
             if (substrings[0] == "CHI")
             {
                 if (currentChannel == Int32.Parse(substrings[1]))
@@ -122,7 +73,7 @@ namespace WieloosobowyKomunikatorGlosowy
                     Console.WriteLine("bylo: " + alreadyOnChannelCounter);
                     if (Int32.Parse(substrings[3]) > alreadyOnChannelCounter)
                     {
-                        ring2.Play();                       
+                        ring2.Play();
                     }
                     else
                     {
@@ -174,7 +125,7 @@ namespace WieloosobowyKomunikatorGlosowy
                     }
                 }
             }
-            if (substrings[0] == "CHB")
+            else if (substrings[0] == "CHB")
             {
                 channelList.Clear();
                 Char de = '|';
@@ -192,11 +143,71 @@ namespace WieloosobowyKomunikatorGlosowy
                 }
                 refreshGridView();
             }
-            if (substrings[0] == "EXIT")
+            else if (substrings[0] == "EXIT")
             {
                 MessageBox.Show("Serwer został wyłączony");
                 Application.Exit();
             }
+            else
+            {
+                string message = e.MessageString.Replace("\u0013", string.Empty);
+                string decryptedMessage = diffieHellman.DecryptMessage(Convert.FromBase64String(message));
+                substrings = decryptedMessage.Split(delimiter);
+                Console.WriteLine("Odszyfrowana wiadomość: " + decryptedMessage);
+                if (substrings[0] == "PASSOK")
+                {
+                    if (InvokeRequired)
+                    {
+
+                        Invoke(new Action(() =>
+                        {
+                            join_button.Visible = false;
+                            btn_endCall.Visible = true;
+
+                        }));
+                    }
+                    else
+                    {
+                        join_button.Visible = false;
+                        btn_endCall.Visible = true;
+                    }
+
+                    k.StartCall(serverIP);
+                }
+                if (substrings[0] == "PASSNOK")
+                {
+                    MessageBox.Show("Hasło niepoprawne. Spróbuj ponownie.");
+                }
+                if (substrings[0] == "BYE")
+                {
+                    if (InvokeRequired)
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            label5.Text = "";
+                            label2.Text = "";
+                            lb_UserList.Items.Clear();
+                            k.HangUp();
+                            alreadyOnChannelCounter = 0;
+                            currentChannel = 0;
+                            join_button.Visible = true;
+                            btn_endCall.Visible = false;
+                        }));
+                    }
+                    else
+                    {
+                        label5.Text = "";
+                        label2.Text = "";
+                        lb_UserList.Items.Clear();
+                        k.HangUp();
+                        alreadyOnChannelCounter = 0;
+                        currentChannel = 0;
+                        join_button.Visible = true;
+                        btn_endCall.Visible = false;
+                    }
+                }
+            }
+            
         }
         private void join_button_Click(object sender, EventArgs e)
         {
@@ -208,7 +219,7 @@ namespace WieloosobowyKomunikatorGlosowy
             {
                 password = Prompt.ShowDialog("Hasło wymagane", "Podaj hasło");
             }
-            client.WriteLine(diffieHellman.EncryptMessage(k.name + ";CH;" + dataGridView1.CurrentCell.RowIndex + ";" + SHA.ChangeToSHA2_256(password))); 
+            client.WriteLine(diffieHellman.EncryptMessage(login + ";CH;" + dataGridView1.CurrentCell.RowIndex + ";" + SHA.ChangeToSHA2_256(password))); 
         }
         public bool mute = false;
         private void mute_button_Click(object sender, EventArgs e)
@@ -231,16 +242,13 @@ namespace WieloosobowyKomunikatorGlosowy
         {
             if (k.call != null)
             {
-                client.WriteLine(diffieHellman.EncryptMessage(k.name + ";BYE;" + currentChannel + ";" + k.call.CallID));
+                client.WriteLine(diffieHellman.EncryptMessage(login + ";BYE;" + currentChannel + ";" + k.call.CallID));
                 k.HangUp();
             }
-            //client.WriteLine(diffieHellman.EncryptMessage("EXIT;"));
             this.Hide();
             client.DataReceived -= Client_DataReceived;
             Login log = new Login();
             log.Show();
-            //Server_IP server_IP = new Server_IP();
-            //server_IP.Show();
 
 
         }
@@ -287,7 +295,7 @@ namespace WieloosobowyKomunikatorGlosowy
             }
             else
             {
-                client.WriteLine(diffieHellman.EncryptMessage(k.name + ";BYE;" + currentChannel + ";" + k.call.CallID));
+                client.WriteLine(diffieHellman.EncryptMessage(login + ";BYE;" + currentChannel + ";" + k.call.CallID));
                 k.HangUp();
                 Application.Exit();
             }
@@ -301,7 +309,7 @@ namespace WieloosobowyKomunikatorGlosowy
             //ring3.Play();
            
             lb_UserList.Items.Clear();
-            client.WriteLine(diffieHellman.EncryptMessage(k.name+";BYE;"+ currentChannel + ";" + k.call.CallID));
+            client.WriteLine(diffieHellman.EncryptMessage(login +";BYE;"+ currentChannel + ";" + k.call.CallID));
            // currentChannel = 0;
         }
     }

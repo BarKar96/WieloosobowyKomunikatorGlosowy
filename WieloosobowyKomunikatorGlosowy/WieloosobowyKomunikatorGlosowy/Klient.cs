@@ -11,8 +11,6 @@ namespace WieloosobowyKomunikatorGlosowy
 {
     public class Klient
     {
-        public string name;
-
         static MP3StreamPlayback mp3Player;
 
         //OZEKI
@@ -34,9 +32,8 @@ namespace WieloosobowyKomunikatorGlosowy
 
         public string callID = null;
 
-        public Klient(string name)
+        public Klient()
         {
-            this.name = name;
            local_ip = GetLocalIPAddress();
            phoneLineList = new List<IPhoneLine>();
             mp3Player = new MP3StreamPlayback("pew.mp3");
@@ -151,7 +148,7 @@ namespace WieloosobowyKomunikatorGlosowy
             connector.Connect(microphone, mediaSender);
             Console.WriteLine("setupDevices2");
 
-            //speaker.Start();
+            speaker.Start();
             connector.Connect(mediaReceiver, speaker);
             Console.WriteLine("setupDevices3");
 
@@ -166,7 +163,7 @@ namespace WieloosobowyKomunikatorGlosowy
 
             phoneLine.Dispose();
             microphone.Dispose();
-            //speaker.Dispose();
+            speaker.Dispose();
             mediaReceiver.Detach();
             mediaSender.Detach();
             connector.Dispose();

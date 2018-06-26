@@ -29,32 +29,43 @@ namespace WieloosobowyKomunikatorGlosowy
 
         public void Client_DataReceived(object sender, SimpleTCP.Message e)
         {
-            Char delimiter = ';';
-            String[] substrings = e.MessageString.Split(delimiter);
-
-            Console.WriteLine("serwer odpowiedzial: " + e.MessageString);
-            if (e.MessageString == "LOGOK")
+            string message = e.MessageString.Replace("\u0013", string.Empty);
+            if (message == "EXIT")
             {
-                client.DataReceived -= Client_DataReceived;
-                ChannelsView.diffieHellman = diffieHellman;
-                ChannelsView frm = new ChannelsView(serverIP, login_name);
-                if (InvokeRequired)
+                MessageBox.Show("Serwer został wyłączony");
+                Application.Exit();
+            }
+            else
+            {
+                string decryptedMessage = diffieHellman.DecryptMessage(Convert.FromBase64String(message));
+                Char delimiter = ';';
+                String[] substrings = decryptedMessage.Split(delimiter);
+
+                Console.WriteLine("serwer odpowiedzial: " + message);
+                Console.WriteLine("Odszyfrowana wiadomość " + decryptedMessage);
+                if (substrings[0] == "LOGOK")
                 {
-                    Invoke(new Action(() =>
+                    client.DataReceived -= Client_DataReceived;
+                    ChannelsView.diffieHellman = diffieHellman;
+                    ChannelsView frm = new ChannelsView(serverIP, login_name);
+                    if (InvokeRequired)
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            Hide();
+                            frm.Show();
+                        }));
+                    }
+                    else
                     {
                         Hide();
                         frm.Show();
-                    }));
+                    }
                 }
-                else
+                else if (substrings[0] == "LOGNOK")
                 {
-                    Hide();
-                    frm.Show();
+                    MessageBox.Show("Nie można się zalogować za pomocą tych danych!");
                 }
-            }
-            else if (e.MessageString == "LOGNOK")
-            {
-                MessageBox.Show("Nie można się zalogować za pomocą tych danych!");
             }
         }
 

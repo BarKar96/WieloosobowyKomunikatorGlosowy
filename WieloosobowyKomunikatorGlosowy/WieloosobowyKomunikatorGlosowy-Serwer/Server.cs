@@ -135,9 +135,9 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                     whichChannel = Int32.Parse(substrings[2]);
                     temp_name = substrings[0];
                     if (channelList[whichChannel].password == substrings[3])
-                        e.Reply("PASSOK");
+                        e.Reply(encryptByIP(e, "PASSOK"));
                     else
-                        e.Reply("PASSNOK");
+                        e.Reply(encryptByIP(e, "PASSNOK"));
 
                 }
                 else if (substrings[1] == "BYE")
@@ -151,23 +151,23 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                     buildChannelMessageInfo();
                     Console.WriteLine("tutaj2");
                     database.RemoveUserFromChannel(substrings[3]);
-                    e.Reply("BYE");
+                    e.Reply(encryptByIP(e, "BYE"));
                 }
                 else if (substrings[0] == "REG")
                 {
                     bool answer = database.AddUser(substrings[1], substrings[2]);
                     if (answer == true)
-                        e.Reply("REGOK");
+                        e.Reply(encryptByIP(e, "REGOK"));
                     else
-                        e.Reply("REGNOK");
+                        e.Reply(encryptByIP(e, "REGNOK"));
                 }
                 else if (substrings[0] == "LOG")
                 {
                     bool answer = database.CheckPassword(substrings[1], substrings[2]);
                     if (answer == true)
-                        e.Reply("LOGOK");
+                        e.Reply(encryptByIP(e, "LOGOK"));
                     else
-                        e.Reply("LOGNOK");
+                        e.Reply(encryptByIP(e, "LOGNOK"));
                 }
                 else if (substrings[0] == "EXIT")
                 {
@@ -326,6 +326,21 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
             return decrypted_message;
         }
 
+        public string encryptByIP(SimpleTCP.Message e, string message)
+        {
+            string encrypted_message = "";
+            string ip = ((IPEndPoint)e.TcpClient.Client.RemoteEndPoint).Address.ToString();
+            foreach (DiffieHellman dh in clientList)
+            {
+                if (dh.ipAdress.Equals(ip))
+                {
+                    encrypted_message = dh.EncryptMessage(message);
+                    break;
+                }
+            }
+            return encrypted_message;
+        }
+
         public void removeFromDHList(SimpleTCP.Message e)
         {
             string ip = ((IPEndPoint)e.TcpClient.Client.RemoteEndPoint).Address.ToString();
@@ -336,10 +351,6 @@ namespace WieloosobowyKomunikatorGlosowy_Serwer
                     clientList.Remove(dh);
                     break;
                 }
-            }
-            foreach (DiffieHellman dh in clientList)
-            {
-                Console.WriteLine(dh.ipAdress);
             }
         }
 
